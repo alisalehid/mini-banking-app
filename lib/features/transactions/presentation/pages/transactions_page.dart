@@ -1,0 +1,21 @@
+import 'package:flutter/material.dart';
+
+class TransactionsPage extends StatefulWidget {
+
+  TransactionsPage({super.key});
+
+  @override
+  State<TransactionsPage> createState() => _TransactionsPageState();
+}
+
+class _TransactionsPageState extends State<TransactionsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        "transactions",
+        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
