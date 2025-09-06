@@ -1,21 +1,16 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.buildlog/
-.history
+# Build folders
+build/
+**/build/
 
-
-
-# Flutter/Dart/Pub related
-**/doc/api/
+# Flutter/Dart
 .dart_tool/
+.packages
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub/
+pubspec.lock
 
-app.*.symbols
-
-# Flutter build files
-build/
+# Android
+.gradle/
+local.properties
+*.iml
