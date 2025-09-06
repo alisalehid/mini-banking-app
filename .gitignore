@@ -16,3 +16,6 @@
 .pub/
 
 app.*.symbols
+
+# Flutter build files
+build/
