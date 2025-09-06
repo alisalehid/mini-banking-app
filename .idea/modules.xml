@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/mini_banking_app.iml" filepath="$PROJECT_DIR$/mini_banking_app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/mini_banking_app_android.iml" filepath="$PROJECT_DIR$/android/mini_banking_app_android.iml" />
     </modules>
   </component>
 </project>
