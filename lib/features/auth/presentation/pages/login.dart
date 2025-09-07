@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mini_banking_app/core/widgets/custom_text_field.dart';
+import 'package:mini_banking_app/core/widgets/rounded_loading_button.dart';
+
+import '../../../../core/theme/colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -8,9 +13,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Controllers for the text fields
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _loadingController = RoundedLoadingButtonController();
 
   @override
   void dispose() {
@@ -19,12 +24,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _login() {
-    // This is where you would handle the login logic.
-    // For now, we'll just print the values.
-    print('Username: ${_usernameController.text}');
-    print('Password: ${_passwordController.text}');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,57 +35,80 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // The "login" text
-              const Text(
-                "Loginn",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+
+              Image.asset(
+                'assets/images/bank.png',
+                width: 100,
+                height: 100,
+                fit: BoxFit.contain,
+              ),
+
+              const SizedBox(height: 20),
+
+              Text(
+                "Banking App",
+                style: GoogleFonts.nunito(
+                  textStyle: const TextStyle(
+                    color: AppColors.textLight,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 30,
+                    letterSpacing: .5,
+                  ),
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 48),
 
-              // Username text field
-              TextField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
+              Text(
+                "Secure Banking",
+                style: GoogleFonts.nunito(
+                  textStyle: const TextStyle(
+                    color: AppColors.textLight2,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    letterSpacing: .5,
                   ),
-                  labelText: 'Username',
-                  hintText: 'Enter your username',
                 ),
+                textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 130),
+
+              CustomTextField(
+                label: "username",
+                controller: _usernameController,
+                hint: "Enter your username",
+              ),
+
               const SizedBox(height: 16),
 
-              // Password text field
-              TextField(
+              CustomTextField(
+                label: "password",
                 controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                ),
+                hint: "Enter your password",
               ),
-              const SizedBox(height: 24),
 
-              // Login button
-              SizedBox(
-                height: 50,
-                child: FilledButton(
-                  onPressed: _login,
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 18),
+              const SizedBox(height: 50),
+
+              CustomLoadingButton(
+                controller: _loadingController,
+                title: "Login",
+                titleColor: AppColors.textDark,
+                fillColor: Colors.black,
+              ),
+
+              TextButton(
+                onPressed: () {
+                  // Handle forgot password logic
+                },
+                child: Text(
+                  'Forgot Password?',
+                  style: GoogleFonts.nunito(
+                    color: AppColors.textLight,
+                    fontSize: 17,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),
+
             ],
           ),
         ),
