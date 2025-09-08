@@ -1,6 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -8,16 +8,16 @@ import '../../../../core/theme/presentation/providers/theme_notifier.dart';
 import '../../../../core/theme/presentation/theme/app_colors.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/rounded_loading_button.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_state.dart';
 import '../bloc/login_cubit.dart';
-import '../../domain/usecases/login_usecase.dart';
-import '../../data/repositories/mock_auth_repository.dart';
+import '../bloc/login_state.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // No need to create a new Cubit here, as it's provided in main.dart.
     return const _LoginView();
   }
 }
@@ -37,7 +37,7 @@ class _LoginViewState extends State<_LoginView> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    final cubit = context.read<LoginCubit>();
+    final loginCubit = context.read<LoginCubit>();
 
     return Scaffold(
       body: Center(
@@ -45,29 +45,23 @@ class _LoginViewState extends State<_LoginView> {
           padding: const EdgeInsets.all(16.0),
           child: BlocConsumer<LoginCubit, LoginState>(
             listener: (context, state) {
-              if (!state.isLoading) {
-                _loadingController.reset();
-              }
+              if (!state.isLoading) _loadingController.reset();
 
               if (state.error != null) {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.error!),
-                    duration: const Duration(seconds: 3),
-                  ),
+                  SnackBar(content: Text(state.error!)),
                 );
               }
 
+              // 🔹 Show success SnackBar only once
               if (state.success) {
+                ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Login successful!"),
-                    duration: Duration(seconds: 3),
-                  ),
+                  const SnackBar(content: Text("Login successful!")),
                 );
-                // Navigate to the dashboard, which is part of the ShellRoute.
-                context.go('/dashboard');
+
+                if (kDebugMode) print('Login successful → redirect now');
               }
             },
             builder: (context, state) {
@@ -98,35 +92,59 @@ class _LoginViewState extends State<_LoginView> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 40),
+
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, authState) {
+                      return authState.isBiometricSupported && authState.isBiometricEnabled
+                          ? Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: IconButton(
+                          icon: Icon(Icons.fingerprint,
+                              size: 40, color: AppColors.buttonColor(context)),
+                          onPressed: state.isLoading
+                              ? null
+                              : () {
+                            _loadingController.start();
+                            loginCubit.loginWithBiometrics();
+                          },
+                          tooltip: 'Login with Fingerprint',
+                        ),
+                      )
+                          : const SizedBox.shrink();
+                    },
+                  ),
                   CustomTextField(
                     label: "Username",
                     controller: _usernameController,
                     hint: "Enter username",
                     errorText: state.usernameError,
-                    onChanged: cubit.usernameChanged,
+                    onChanged: (value) => loginCubit.usernameChanged(value),
                   ),
                   const SizedBox(height: 16),
+
                   CustomTextField(
                     label: "Password",
                     controller: _passwordController,
                     hint: "Enter password",
                     obscureText: true,
                     errorText: state.passwordError,
-                    onChanged: cubit.passwordChanged,
+                    onChanged: (value) => loginCubit.passwordChanged(value),
                   ),
                   const SizedBox(height: 40),
+
+                  // 🔑 Login button
                   CustomLoadingButton(
                     controller: _loadingController,
                     title: "Login",
                     titleColor: AppColors.titleButtonColor(context),
                     fillColor: state.isValid
                         ? AppColors.buttonColor(context)
-                        : AppColors.buttonColor(context),
+                        : AppColors.buttonColor(context).withOpacity(0.5),
                     onTap: state.isValid
                         ? () {
                       _loadingController.start();
-                      cubit.login();
+                      loginCubit.loginWithCredentials();
                     }
                         : null,
                   ),
@@ -137,5 +155,12 @@ class _LoginViewState extends State<_LoginView> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

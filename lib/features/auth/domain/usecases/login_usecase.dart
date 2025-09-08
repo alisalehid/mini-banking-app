@@ -1,11 +1,20 @@
+import 'package:dartz/dartz.dart';
+import '../../../../core/error/failures.dart';
+import '../entities/biometric_result.dart';
+import '../repositories/auth_repository.dart';
 import '../../data/repositories/mock_auth_repository.dart';
 
 class LoginUseCase {
-  final MockAuthRepository repository;
+  final AuthRepository authRepository; // For biometrics
+  final MockAuthRepository mockRepository; // For username/password
 
-  LoginUseCase(this.repository);
+  LoginUseCase(this.authRepository, this.mockRepository);
 
-  Future<bool> execute(String username, String password) {
-    return repository.login(username, password);
+  Future<bool> loginWithCredentials(String username, String password) async {
+    return await mockRepository.login(username, password);
+  }
+
+  Future<Either<Failure, BiometricResult>> loginWithBiometrics() async {
+    return await authRepository.authenticateWithBiometrics();
   }
 }

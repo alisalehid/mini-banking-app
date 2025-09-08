@@ -1,56 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/usecases/login_usecase.dart';
-
-class LoginState {
-  final String username;
-  final String password;
-  final String? usernameError;
-  final String? passwordError;
-  final bool isValid;
-  final bool isLoading;
-  final String? error;
-  final bool success; // New flag
-
-  LoginState({
-    this.username = '',
-    this.password = '',
-    this.usernameError,
-    this.passwordError,
-    this.isValid = false,
-    this.isLoading = false,
-    this.error,
-    this.success = false, // Initialize to false
-  });
-
-  LoginState copyWith({
-    String? username,
-    String? password,
-    Object? usernameError = _noChange,
-    Object? passwordError = _noChange,
-    bool? isValid,
-    bool? isLoading,
-    Object? error = _noChange,
-    bool? success, // Add to copyWith
-  }) {
-    return LoginState(
-      username: username ?? this.username,
-      password: password ?? this.password,
-      usernameError: usernameError == _noChange ? this.usernameError : usernameError as String?,
-      passwordError: passwordError == _noChange ? this.passwordError : passwordError as String?,
-      isValid: isValid ?? this.isValid,
-      isLoading: isLoading ?? this.isLoading,
-      error: error == _noChange ? this.error : error as String?,
-      success: success ?? this.success, // Include in copyWith
-    );
-  }
-
-  static const _noChange = Object();
-}
+import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  final LoginUseCase _loginUseCase;
+  final LoginUseCase loginUseCase;
+  final SharedPreferences prefs;
 
-  LoginCubit(this._loginUseCase) : super(LoginState());
+  LoginCubit(this.loginUseCase, this.prefs) : super(LoginState()) {
+    initialize(); // Restore login state on startup
+  }
 
   void usernameChanged(String value) {
     String? usernameError;
@@ -102,12 +61,13 @@ class LoginCubit extends Cubit<LoginState> {
     String? usernameError,
     String? passwordError,
   }) {
-    final isUsernameValid = username.isNotEmpty && RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(username);
+    final isUsernameValid =
+        username.isNotEmpty && RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(username);
     final isPasswordValid = password.isNotEmpty && password.length >= 6;
     return isUsernameValid && isPasswordValid && usernameError == null && passwordError == null;
   }
 
-  Future<void> login() async {
+  Future<void> loginWithCredentials() async {
     if (!state.isValid) {
       emit(state.copyWith(
         usernameError: state.username.isEmpty ? "Username cannot be empty" : null,
@@ -121,24 +81,102 @@ class LoginCubit extends Cubit<LoginState> {
       return;
     }
 
-    emit(state.copyWith(isLoading: true, error: null, success: false));
+    emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      final success = await _loginUseCase.execute(
-        state.username,
-        state.password,
-      );
+      final success =
+      await loginUseCase.loginWithCredentials(state.username, state.password);
 
-      emit(state.copyWith(
-        isLoading: false,
-        error: success ? null : "Invalid credentials",
-        success: success, // Set success flag
-      ));
+      if (success) {
+        await prefs.setBool('isLoggedIn', true);
+        emit(state.copyWith(
+          isLoading: false,
+          error: null,
+          success: true,        // One-time trigger
+          username: '',
+          password: '',
+          usernameError: null,
+          passwordError: null,
+          isValid: false,
+          isLoggedIn: true,
+        ));
+
+        // Reset success after listener triggers
+        Future.microtask(() => emit(state.copyWith(success: false)));
+      } else {
+        emit(state.copyWith(
+          isLoading: false,
+          error: "Invalid credentials",
+          success: false,
+          isLoggedIn: false,
+        ));
+      }
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
-        error: "Something went wrong",
+        error: "Something went wrong: $e",
         success: false,
       ));
     }
-  }}
+  }
+
+  Future<void> loginWithBiometrics() async {
+    final isBiometricEnabled = prefs.getBool('isBiometricEnabled') ?? false;
+    if (!isBiometricEnabled) {
+      emit(state.copyWith(error: 'Biometric login is not enabled', success: false));
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, error: null));
+
+    final result = await loginUseCase.loginWithBiometrics();
+    result.fold(
+          (failure) {
+        emit(state.copyWith(isLoading: false, error: failure.message, success: false));
+      },
+          (biometricResult) async {
+        if (biometricResult.isAuthenticated) {
+          await prefs.setBool('isLoggedIn', true);
+          emit(state.copyWith(
+            isLoading: false,
+            error: null,
+            success: true,
+            username: '',
+            password: '',
+            usernameError: null,
+            passwordError: null,
+            isValid: false,
+            isLoggedIn: true,
+          ));
+
+          Future.microtask(() => emit(state.copyWith(success: false)));
+        } else {
+          emit(state.copyWith(
+            isLoading: false,
+            error: biometricResult.message ?? 'Biometric authentication failed',
+            success: false,
+          ));
+        }
+      },
+    );
+  }
+
+  void initialize() async {
+    final loggedIn = prefs.getBool('isLoggedIn') ?? false;
+    emit(state.copyWith(isLoggedIn: loggedIn));
+  }
+
+  Future<void> logout() async {
+    await prefs.setBool('isLoggedIn', false);
+    emit(state.copyWith(
+      isLoggedIn: false,
+      success: false,
+      username: '',
+      password: '',
+      usernameError: null,
+      passwordError: null,
+      isValid: false,
+      error: null,
+    ));
+  }
+}

@@ -12,7 +12,7 @@ class DashboardPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Home'),
       ),
-      body: Center(child: Text("dashboard"),)
+      body: Center(child: Text("Home"),)
     );
   }
 }
