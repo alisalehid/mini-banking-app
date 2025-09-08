@@ -87,6 +87,7 @@ flutter:
 
   assets:
     - assets/images/bank.png
+    - assets/images/profile.png
 
   fonts:
     - family: Original

@@ -7,20 +7,21 @@ import '../providers/theme_notifier.dart';
 class AppColors {
   // Light theme colors
   static const Color lightPrimary = Color(0xFF000000); // Black (text/icons)
-  static const Color lightAccent = Color(0xFF00C853); // Green accent (health score bar)
-  static const Color lightBackground = Color(0xFFFFFFFF); // White background
+  static const Color lightAccent = Color(0xFFBF4C4C); // Green accent (health score bar)
+  static const Color lightBackground = Color(0xFFF3F3F3); // White background
   static const Color lightText = Color(0xFF212121); // Dark grey text
   static const Color lightButton = Color(0xFF000000); // Black buttons (Done, etc.)
-  static const Color lightTitleButton = Color(0xFFE0E0E0); // Deep blue for title buttons
+  static const Color lightTitleButton = Color(0xFFE0E0E0); // Deep blue for title buttons∂
+  static const Color lightCardBackground = Color(0xFFFFFFFF);
 
 // Dark theme colors
   static const Color darkPrimary = Color(0xFFFFFFFF); // White text/icons
-  static const Color darkAccent = Color(0xFF00E676); // Bright green accent
+  static const Color darkAccent = Color(0xFFBF4C4C); // Bright green accent
   static const Color darkBackground = Color(0xFF121212); // Dark background
   static const Color darkText = Color(0xFFE0E0E0); // Light grey text
   static const Color darkButton = Color(0xFFFFFFFF); // White buttons
-  static const Color darkTitleButton = Color(0xFF212121); // Light blue for title buttons
-
+  static const Color darkTitleButton = Color(0xFFFFFFFF); // Light card background
+  static const Color darkCardBackground = Color(0xFF1C1C1C); // car dark background
 
 
   // ThemeData for light mode
@@ -107,4 +108,34 @@ class AppColors {
     }
     return themeNotifier.themeMode == AppThemeMode.dark ? darkTitleButton : lightTitleButton;
   }
+
+  static Color cardBackground(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
+
+    if (themeNotifier.themeMode == AppThemeMode.system) {
+      return MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? darkCardBackground
+          : lightCardBackground;
+    }
+
+    return themeNotifier.themeMode == AppThemeMode.dark
+        ? darkCardBackground
+        : lightCardBackground;
+  }
+
+  static Color background(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
+
+    if (themeNotifier.themeMode == AppThemeMode.system) {
+      return MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? darkBackground
+          : lightBackground;
+    }
+
+    return themeNotifier.themeMode == AppThemeMode.dark
+        ? darkCardBackground
+        : lightCardBackground;
+  }
+
+
 }
