@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class TransferPage extends StatefulWidget {
 
-  TransferPage({super.key});
+  const TransferPage({super.key});
 
   @override
   State<TransferPage> createState() => _TransferPageState();

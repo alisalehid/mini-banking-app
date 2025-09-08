@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class TransactionsPage extends StatefulWidget {
 
-  TransactionsPage({super.key});
+  const TransactionsPage({super.key});
 
   @override
   State<TransactionsPage> createState() => _TransactionsPageState();

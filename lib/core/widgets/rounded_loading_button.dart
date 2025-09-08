@@ -4,7 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
+
+import '../theme/presentation/providers/theme_notifier.dart';
+import '../theme/presentation/theme/app_colors.dart';
 
 /// States that your button can assume via the controller
 enum ButtonState { idle, loading, success, error }
@@ -16,6 +20,7 @@ class CustomGradientLoadingButton extends StatelessWidget {
     this.fullWidth = false,
     this.suffix,
     this.onTap,
+    this.indicatorColor = Colors.white,
     super.key,
     this.buttonTextColor = Colors.white,
     this.gradientColors = const [
@@ -33,6 +38,7 @@ class CustomGradientLoadingButton extends StatelessWidget {
   final String title;
   final List<Color> gradientColors;
   final Color buttonTextColor;
+  final Color indicatorColor;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +47,7 @@ class CustomGradientLoadingButton extends StatelessWidget {
       gradientColors: gradientColors,
       height: 50,
       width: fullWidth ? MediaQuery.of(context).size.width : 300,
-      borderRadius: 100, // ✅ pill shape
+      borderRadius: 100,
       animateOnTap: false,
       controller: controller,
       disabledColor: Colors.transparent,
@@ -73,7 +79,7 @@ class _GradientLoadingButton extends StatefulWidget {
     required this.gradientColors,
     this.height = 50,
     this.width = 300,
-    this.borderRadius = 100, // ✅ pill
+    this.borderRadius = 100,
     this.animateOnTap = true,
     this.disabledColor,
   }) : super(key: key);
@@ -98,6 +104,8 @@ class _GradientLoadingButtonState extends State<_GradientLoadingButton>
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+
     return StreamBuilder<ButtonState>(
       stream: _state.stream,
       builder: (context, snapshot) {
@@ -111,13 +119,17 @@ class _GradientLoadingButtonState extends State<_GradientLoadingButton>
               children: [
                 AnimatedMeshGradient(
                   options: AnimatedMeshGradientOptions(
-                      amplitude: 25, frequency: 10, speed: 5),
+                    amplitude: 25,
+                    frequency: 10,
+                    speed: 5,
+                  ),
                   colors: widget.gradientColors,
                 ),
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: widget.onPressed == null || state == ButtonState.loading
+                    onTap:
+                        widget.onPressed == null || state == ButtonState.loading
                         ? null
                         : _onTap,
                     borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -126,14 +138,16 @@ class _GradientLoadingButtonState extends State<_GradientLoadingButton>
                       width: widget.width,
                       alignment: Alignment.center,
                       child: state == ButtonState.loading
-                          ? const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        strokeWidth: 2.0,
-                      )
+                          ? CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.titleButtonColor(context),
+                              ),
+                              strokeWidth: 2.0,
+                            )
                           : widget.child,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -170,6 +184,7 @@ class CustomLoadingButton extends StatelessWidget {
     this.fullWidth = false,
     this.suffix,
     this.onTap,
+    this.indicatorColor = Colors.white,
     super.key,
   });
 
@@ -180,17 +195,19 @@ class CustomLoadingButton extends StatelessWidget {
   final String title;
   final Color fillColor;
   final Color titleColor;
+  final Color indicatorColor;
 
   @override
   Widget build(BuildContext context) {
     final disableColor = Colors.grey.shade800;
-    final double buttonWidth =
-    fullWidth ? MediaQuery.of(context).size.width : MediaQuery.of(context).size.width * 0.8;
+    final double buttonWidth = fullWidth
+        ? MediaQuery.of(context).size.width
+        : MediaQuery.of(context).size.width * 0.8;
     return _RoundedLoadingButton(
       color: fillColor,
       height: 50,
       width: buttonWidth,
-      borderRadius: 100, // ✅ pill shape
+      borderRadius: 100,
       animateOnTap: false,
       controller: controller,
       disabledColor: Colors.transparent,
@@ -253,7 +270,7 @@ class _RoundedLoadingButton extends StatefulWidget {
     this.loaderStrokeWidth = 2.0,
     this.animateOnTap = true,
     this.valueColor = Colors.white,
-    this.borderRadius = 100, // ✅ pill shape
+    this.borderRadius = 100,
     this.elevation = 2,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.easeInOutCirc,
@@ -292,7 +309,9 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
       alignment: FractionalOffset.center,
       decoration: BoxDecoration(
         color: widget.successColor ?? theme.primaryColor,
-        borderRadius: BorderRadius.all(Radius.circular(_bounceAnimation.value / 2)),
+        borderRadius: BorderRadius.all(
+          Radius.circular(_bounceAnimation.value / 2),
+        ),
       ),
       width: _bounceAnimation.value,
       height: _bounceAnimation.value,
@@ -305,7 +324,9 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
       alignment: FractionalOffset.center,
       decoration: BoxDecoration(
         color: widget.errorColor,
-        borderRadius: BorderRadius.all(Radius.circular(_bounceAnimation.value / 2)),
+        borderRadius: BorderRadius.all(
+          Radius.circular(_bounceAnimation.value / 2),
+        ),
       ),
       width: _bounceAnimation.value,
       height: _bounceAnimation.value,
@@ -317,7 +338,7 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
     Widget _loader = SizedBox(
       height: widget.loaderSize,
       width: widget.loaderSize,
-      child: const CupertinoActivityIndicator(color: Colors.black),
+      child:  CupertinoActivityIndicator(color: AppColors.titleButtonColor(context)),
     );
 
     Widget childStream = StreamBuilder(
@@ -360,11 +381,20 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
   void initState() {
     super.initState();
 
-    _buttonController = AnimationController(duration: widget.duration, vsync: this);
+    _buttonController = AnimationController(
+      duration: widget.duration,
+      vsync: this,
+    );
 
-    _checkButtonControler = AnimationController(duration: widget.completionDuration, vsync: this);
+    _checkButtonControler = AnimationController(
+      duration: widget.completionDuration,
+      vsync: this,
+    );
 
-    _borderController = AnimationController(duration: widget._borderDuration, vsync: this);
+    _borderController = AnimationController(
+      duration: widget._borderDuration,
+      vsync: this,
+    );
 
     _bounceAnimation = Tween<double>(begin: 0, end: widget.height).animate(
       CurvedAnimation(
@@ -373,9 +403,10 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
       ),
     )..addListener(() => setState(() {}));
 
-    _squeezeAnimation = Tween<double>(begin: widget.width, end: widget.height).animate(
-      CurvedAnimation(parent: _buttonController, curve: widget.curve),
-    )..addListener(() => setState(() {}));
+    _squeezeAnimation =
+        Tween<double>(begin: widget.width, end: widget.height).animate(
+          CurvedAnimation(parent: _buttonController, curve: widget.curve),
+        )..addListener(() => setState(() {}));
 
     _squeezeAnimation.addStatusListener((state) {
       if (state == AnimationStatus.completed && widget.animateOnTap) {
@@ -388,8 +419,7 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
     _borderAnimation = BorderRadiusTween(
       begin: BorderRadius.circular(widget.borderRadius),
       end: BorderRadius.circular(widget.height),
-    ).animate(_borderController)
-      ..addListener(() => setState(() {}));
+    ).animate(_borderController)..addListener(() => setState(() {}));
 
     _state.stream.listen((event) {
       if (!mounted) return;
@@ -464,12 +494,12 @@ class RoundedLoadingButtonController {
   VoidCallback? _resetListener;
 
   void _addListeners(
-      VoidCallback startListener,
-      VoidCallback stopListener,
-      VoidCallback successListener,
-      VoidCallback errorListener,
-      VoidCallback resetListener,
-      ) {
+    VoidCallback startListener,
+    VoidCallback stopListener,
+    VoidCallback successListener,
+    VoidCallback errorListener,
+    VoidCallback resetListener,
+  ) {
     _startListener = startListener;
     _stopListener = stopListener;
     _successListener = successListener;
@@ -477,15 +507,20 @@ class RoundedLoadingButtonController {
     _resetListener = resetListener;
   }
 
-  final BehaviorSubject<ButtonState> _state = BehaviorSubject<ButtonState>.seeded(ButtonState.idle);
+  final BehaviorSubject<ButtonState> _state =
+      BehaviorSubject<ButtonState>.seeded(ButtonState.idle);
 
   Stream<ButtonState> get stateStream => _state.stream;
 
   ButtonState? get currentState => _state.value;
 
   void start() => _startListener?.call();
+
   void stop() => _stopListener?.call();
+
   void success() => _successListener?.call();
+
   void error() => _errorListener?.call();
+
   void reset() => _resetListener?.call();
 }

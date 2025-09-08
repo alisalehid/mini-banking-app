@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
-  final String? hint; // <-- New hint parameter
+  final String? hint;
   final String? errorText;
   final TextEditingController controller;
   final bool obscureText;
   final TextInputType keyboardType;
-  final ValueChanged<String>? onChanged;
+  final ValueChanged<String> onChanged;
 
   const CustomTextField({
     super.key,
     required this.label,
     required this.controller,
-    this.hint, // <-- Initialize hint
+    required this.onChanged,
+    this.hint,
     this.errorText,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
-    this.onChanged,
   });
 
   @override
@@ -31,14 +31,12 @@ class CustomTextField extends StatelessWidget {
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
-        hintText: hint, // <-- Add hintText here
+        hintText: hint,
         errorText: errorText,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         filled: true,
         fillColor: theme.colorScheme.surface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-
-        // Rounded border
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide(color: theme.dividerColor),
