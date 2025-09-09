@@ -14,5 +14,3 @@ class LoadTransactions extends TransactionEvent {
   @override
   List<Object?> get props => [page, limit];
 }
-
-class LoadMoreTransactions extends TransactionEvent {}

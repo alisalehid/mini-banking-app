@@ -6,7 +6,8 @@ import '../bloc/transaction_event.dart';
 import '../bloc/transaction_state.dart';
 import '../widgets/transaction_card.dart';
 import '../widgets/transaction_placeholder.dart';
-
+import 'package:shimmer/shimmer.dart';
+import '../widgets/account_filter_shimmer.dart'; // Import the new shimmer widget
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key});
@@ -16,19 +17,13 @@ class TransactionPage extends StatefulWidget {
 }
 
 class _TransactionPageState extends State<TransactionPage> {
-  final ScrollController _scrollController = ScrollController();
+  String _searchQuery = "";
+  String _selectedAccount = "All";
 
   @override
   void initState() {
     super.initState();
-    context.read<TransactionBloc>().add(LoadTransactions(page: 1, limit: 10));
-    _scrollController.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      context.read<TransactionBloc>().add(LoadMoreTransactions());
-    }
+    context.read<TransactionBloc>().add(LoadTransactions(page: 1, limit: 1000));
   }
 
   @override
@@ -36,32 +31,149 @@ class _TransactionPageState extends State<TransactionPage> {
     return Scaffold(
       backgroundColor: AppColors.background(context),
       body: Padding(
-        padding: const EdgeInsets.only(top: 30),
-        child: BlocBuilder<TransactionBloc, TransactionState>(
-          builder: (context, state) {
-            if (state is TransactionLoading) {
-              return ListView.builder(
-                itemCount: 5, // show 5 skeletons
-                itemBuilder: (_, __) => const TransactionPlaceholder(),
-              );
-            } else if (state is TransactionLoaded) {
-              return ListView.builder(
-                controller: _scrollController,
-                itemCount: state.hasReachedMax
-                    ? state.transactions.length
-                    : state.transactions.length + 1,
-                itemBuilder: (context, index) {
-                  if (index >= state.transactions.length) {
-                    return const TransactionPlaceholder();
+        padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+        child: Column(
+          children: [
+            const SizedBox(height: 50),
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Search transactions...",
+                hintStyle: const TextStyle(color: Colors.grey),
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: AppColors.cardBackground(context),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+            ),
+            const SizedBox(height: 25),
+            BlocBuilder<TransactionBloc, TransactionState>(
+              builder: (context, state) {
+                if (state is TransactionLoaded) {
+                  final accounts = state.transactions
+                      .map((tx) => tx.account)
+                      .toSet()
+                      .toList();
+
+                  final filterOptions = ["All", ...accounts];
+
+                  return SizedBox(
+                    height: 40,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: filterOptions.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        final account = filterOptions[index];
+                        final isSelected = _selectedAccount == account;
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedAccount = account;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              gradient: isSelected
+                                  ? const LinearGradient(
+                                colors: [
+                                  Color(0xFF4A90E2),
+                                  Color(0xFFFF5F6D),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                                  : LinearGradient(
+                                colors: [
+                                  AppColors.cardBackground(context),
+                                  AppColors.cardBackground(context),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: Text(
+                                account.replaceAll(RegExp(r'[_-]'), ' '),
+                                style: TextStyle(
+                                  color: isSelected ? Colors.white : AppColors.textColor(context),
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                } else if (state is TransactionLoading) {
+                  // Show the shimmer effect for the horizontal filters
+                  return SizedBox(
+                    height: 40,
+                    child: Shimmer.fromColors(
+                      baseColor: AppColors.cardBackground(context),
+                      highlightColor: Colors.grey.shade100,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 4, // Show a fixed number of placeholder items
+                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          return const AccountFilterShimmer();
+                        },
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: BlocBuilder<TransactionBloc, TransactionState>(
+                builder: (context, state) {
+                  if (state is TransactionLoading) {
+                    return ListView.builder(
+                      itemCount: 20,
+                      itemBuilder: (_, __) => const TransactionPlaceholder(),
+                    );
+                  } else if (state is TransactionLoaded) {
+                    final filteredTransactions = state.transactions.where((tx) {
+                      final matchesSearch = tx.description.toLowerCase().contains(_searchQuery);
+                      final matchesAccount = _selectedAccount == "All" || tx.account == _selectedAccount;
+                      return matchesSearch && matchesAccount;
+                    }).toList();
+
+                    if (filteredTransactions.isEmpty) {
+                      return const Center(
+                        child: Text("Nothing found"),
+                      );
+                    }
+
+                    return ListView.builder(
+                      itemCount: filteredTransactions.length,
+                      itemBuilder: (context, index) {
+                        final tx = filteredTransactions[index];
+                        return TransactionCard(transaction: tx);
+                      },
+                    );
+                  } else if (state is TransactionError) {
+                    return Center(child: Text("Error: ${state.message}"));
                   }
-                  final tx = state.transactions[index];
-                  return TransactionCard(transaction: tx);              },
-              );
-            } else if (state is TransactionError) {
-              return Center(child: Text("Error: ${state.message}"));
-            }
-            return const SizedBox.shrink();
-          },
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -26,52 +26,79 @@ class TransactionCard extends StatelessWidget {
       color: Colors.green[400],
     );
 
-    final backgroundColor = isWithdrawal ? Colors.red[50] : Colors.green[50];
+    final backgroundColor = isWithdrawal ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1);
+    final cleanAccount = transaction.account.replaceAll(RegExp(r'[_-]'), ' ');
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), // Increased margin
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10), // Increased padding
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              shape: BoxShape.circle,
-            ),
-            child: iconWidget,
-          ),
-          const SizedBox(width: 16), // Increased spacing between icon and text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.description.split(' at ')[0], // Name only
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[800],
-                  ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 10 , right: 10),
+
+        child: Container(
+          margin: const EdgeInsets.symmetric( vertical: 10), // Increased margin
+          child: Row(
+            children: [
+              Container(
+                height: 35,
+                width: 35,
+                padding: const EdgeInsets.all(10), // Increased padding
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 4), // Added spacing between text lines
-                Text(
-                  _formatDate(transaction.date),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                child: iconWidget,
+              ),
+              const SizedBox(width: 16), // Increased spacing between icon and text
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      transaction.description.split(' at ')[0], // Name only
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textColor(context),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis, // adds "..." when too long
+                    ),
+
+                    const SizedBox(height: 4),
+                    RichText(
+                      text: TextSpan(
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                        children: [
+                          const TextSpan(text: "via "),
+                          TextSpan(
+                            text: cleanAccount,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600, // bold
+                              color: Colors.grey[800],     // darker
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),                    Text(
+                      _formatDate(transaction.date),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Text(
+                "${isWithdrawal ? '-' : '+'}\$${transaction.amount}",
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isWithdrawal ? Colors.red[700] : Colors.green[700],
+                ),
+              ),
+            ],
           ),
-          Text(
-            "${isWithdrawal ? '-' : '+'}\$${transaction.amount}",
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: isWithdrawal ? Colors.red[700] : Colors.green[700],
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      );
+
   }
 
   String _formatDate(DateTime date) {
