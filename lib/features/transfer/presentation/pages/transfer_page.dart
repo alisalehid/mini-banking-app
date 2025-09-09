@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 
-class TransferPage extends StatefulWidget {
+import '../../../../core/theme/presentation/theme/app_colors.dart';
+class TransferPage extends StatelessWidget {
 
   const TransferPage({super.key});
 
   @override
-  State<TransferPage> createState() => _TransferPageState();
-}
-
-class _TransferPageState extends State<TransferPage> {
-  @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        "transfer",
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Scaffold(
+      backgroundColor: AppColors.background(context),
+      body: const Center(
+        child: Text(
+          "transfer",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

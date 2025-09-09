@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mini_banking_app/features/settings/presentation/pages/setting_page.dart';
 import '../core/widgets/app_scaffold.dart';
@@ -31,7 +30,7 @@ GoRouter createRouter(LoginCubit authCubit) {
           ),
           GoRoute(
             path: '/transactions',
-            builder: (_, __) => const TransactionsPage(),
+            builder: (_, __) => const TransactionPage(),
           ),
           GoRoute(
             path: '/settings',

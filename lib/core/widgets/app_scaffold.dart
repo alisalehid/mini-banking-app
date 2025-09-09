@@ -1,4 +1,3 @@
-// lib/src/core/widgets/app_scaffold.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mini_banking_app/core/theme/presentation/theme/app_colors.dart';

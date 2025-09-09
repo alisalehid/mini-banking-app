@@ -1,57 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mini_banking_app/core/theme/presentation/theme/app_colors.dart';
+import '../bloc/transaction_bloc.dart';
+import '../bloc/transaction_event.dart';
+import '../bloc/transaction_state.dart';
+import '../widgets/transaction_card.dart';
+import '../widgets/transaction_placeholder.dart';
 
-import '../../../../core/theme/presentation/theme/app_colors.dart';
-import '../../../../core/theme/presentation/providers/theme_notifier.dart';
 
-class TransactionsPage extends StatefulWidget {
-
-  const TransactionsPage({super.key});
+class TransactionPage extends StatefulWidget {
+  const TransactionPage({super.key});
 
   @override
-  State<TransactionsPage> createState() => _TransactionsPageState();
+  State<TransactionPage> createState() => _TransactionPageState();
 }
 
-class _TransactionsPageState extends State<TransactionsPage> {
+class _TransactionPageState extends State<TransactionPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<TransactionBloc>().add(LoadTransactions(page: 1, limit: 10));
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      context.read<TransactionBloc>().add(LoadMoreTransactions());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
-
-
     return Scaffold(
       backgroundColor: AppColors.background(context),
-
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            /// User Profile Card
-            ///
-            SizedBox(height: 100,),
-            Card(
-              color: AppColors.cardBackground(context),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 0,
-              child: ListTile(
-                leading: const CircleAvatar(
-                  radius: 28,
-                  backgroundImage: AssetImage("assets/images/profile.png"),
-                ),
-                title: const Text(
-                  "John sample",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text("User account"),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-
-
-            SizedBox(height: 50,)
-          ],
+        padding: const EdgeInsets.only(top: 30),
+        child: BlocBuilder<TransactionBloc, TransactionState>(
+          builder: (context, state) {
+            if (state is TransactionLoading) {
+              return ListView.builder(
+                itemCount: 5, // show 5 skeletons
+                itemBuilder: (_, __) => const TransactionPlaceholder(),
+              );
+            } else if (state is TransactionLoaded) {
+              return ListView.builder(
+                controller: _scrollController,
+                itemCount: state.hasReachedMax
+                    ? state.transactions.length
+                    : state.transactions.length + 1,
+                itemBuilder: (context, index) {
+                  if (index >= state.transactions.length) {
+                    return const TransactionPlaceholder();
+                  }
+                  final tx = state.transactions[index];
+                  return TransactionCard(transaction: tx);              },
+              );
+            } else if (state is TransactionError) {
+              return Center(child: Text("Error: ${state.message}"));
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
