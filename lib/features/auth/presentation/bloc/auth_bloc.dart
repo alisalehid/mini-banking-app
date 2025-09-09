@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../domain/entities/biometric_result.dart';
 import '../../domain/usecases/check_biometric_login.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -37,31 +38,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ToggleBiometricLogin event, Emitter<AuthState> emit) async {
     if (event.enable) {
       if (!state.isBiometricSupported) {
-        emit(state.copyWith(
-            message: 'Biometric authentication is not supported on this device'));
+        emit(state.copyWith(message: 'Biometric authentication not supported'));
         return;
       }
 
-      final result = await checkBiometricLogin.authenticate();
-      result.fold(
-            (failure) => emit(state.copyWith(
-            message: failure.message, isBiometricEnabled: false)),
-            (biometricResult) {
+      try {
+        final result = await checkBiometricLogin.authenticate();
+        if (result.isRight()) {
+          final biometricResult = result.getOrElse(() => BiometricResult(isSupported: false, isAuthenticated: false, message: 'Unknown error'));
           if (biometricResult.isAuthenticated) {
-            prefs.setBool('isBiometricEnabled', true);
-            emit(state.copyWith(
-                isBiometricEnabled: true, message: biometricResult.message));
+            await prefs.setBool('isBiometricEnabled', true);
+            emit(state.copyWith(isBiometricEnabled: true, message: 'Biometric login enabled'));
           } else {
-            prefs.setBool('isBiometricEnabled', false);
-            emit(state.copyWith(
-                isBiometricEnabled: false, message: biometricResult.message));
+            emit(state.copyWith(isBiometricEnabled: false, message: biometricResult.message));
           }
-        },
-      );
+        } else {
+          emit(state.copyWith(isBiometricEnabled: false, message: 'Biometric login failed'));
+        }
+      } catch (e) {
+        emit(state.copyWith(isBiometricEnabled: false, message: 'Error: $e'));
+      }
     } else {
       await prefs.setBool('isBiometricEnabled', false);
-      emit(state.copyWith(
-          isBiometricEnabled: false, message: 'Biometric login disabled'));
+      emit(state.copyWith(isBiometricEnabled: false, message: 'Biometric login disabled'));
     }
   }
+
+
 }

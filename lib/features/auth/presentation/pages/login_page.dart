@@ -1,25 +1,22 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/theme/presentation/providers/theme_notifier.dart';
-import '../../../../core/theme/presentation/theme/app_colors.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/rounded_loading_button.dart';
-import '../bloc/auth_bloc.dart';
-import '../bloc/auth_state.dart';
+import '../../../../core/theme/presentation/providers/theme_notifier.dart';
+import '../../../../core/theme/presentation/theme/app_colors.dart';
 import '../bloc/login_cubit.dart';
 import '../bloc/login_state.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_state.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const _LoginView();
-  }
+  Widget build(BuildContext context) => const _LoginView();
 }
 
 class _LoginView extends StatefulWidget {
@@ -36,7 +33,6 @@ class _LoginViewState extends State<_LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = Provider.of<ThemeNotifier>(context);
     final loginCubit = context.read<LoginCubit>();
 
     return Scaffold(
@@ -54,25 +50,18 @@ class _LoginViewState extends State<_LoginView> {
                 );
               }
 
-              // 🔹 Show success SnackBar only once
               if (state.success) {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Login successful!")),
                 );
-
-                if (kDebugMode) print('Login successful → redirect now');
               }
             },
             builder: (context, state) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Image.asset(
-                    'assets/images/bank.png',
-                    width: 100,
-                    height: 100,
-                  ),
+                  Image.asset('assets/images/bank.png', width: 100, height: 100),
                   const SizedBox(height: 20),
                   Text(
                     "Banking App",
@@ -94,42 +83,43 @@ class _LoginViewState extends State<_LoginView> {
                   ),
                   const SizedBox(height: 40),
 
+                  // 🔹 Fingerprint login button
                   BlocBuilder<AuthBloc, AuthState>(
                     builder: (context, authState) {
-                      return authState.isBiometricSupported && authState.isBiometricEnabled
-                          ? Padding(
+                      if (!authState.isBiometricEnabled || !authState.isBiometricSupported) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
                         padding: const EdgeInsets.only(bottom: 20),
                         child: IconButton(
                           icon: Icon(Icons.fingerprint,
                               size: 40, color: AppColors.buttonColor(context)),
-                          onPressed: state.isLoading
-                              ? null
-                              : () {
+                          onPressed: state.isLoading ? null : () {
                             _loadingController.start();
                             loginCubit.loginWithBiometrics();
                           },
                           tooltip: 'Login with Fingerprint',
                         ),
-                      )
-                          : const SizedBox.shrink();
+                      );
                     },
                   ),
+
+                  // 🔹 Username/password fields
                   CustomTextField(
                     label: "Username",
                     controller: _usernameController,
                     hint: "Enter username",
                     errorText: state.usernameError,
-                    onChanged: (value) => loginCubit.usernameChanged(value),
+                    onChanged: loginCubit.usernameChanged,
                   ),
                   const SizedBox(height: 16),
-
                   CustomTextField(
                     label: "Password",
                     controller: _passwordController,
                     hint: "Enter password",
                     obscureText: true,
                     errorText: state.passwordError,
-                    onChanged: (value) => loginCubit.passwordChanged(value),
+                    onChanged: loginCubit.passwordChanged,
                   ),
                   const SizedBox(height: 40),
 

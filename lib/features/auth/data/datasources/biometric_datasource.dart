@@ -1,5 +1,4 @@
 import 'package:local_auth/local_auth.dart';
-import '../../../../core/error/exceptions.dart';
 import '../models/biometric_result.dart';
 
 abstract class BiometricDataSource {
@@ -9,7 +8,6 @@ abstract class BiometricDataSource {
 
 class BiometricDataSourceImpl implements BiometricDataSource {
   final LocalAuthentication localAuth;
-
   BiometricDataSourceImpl(this.localAuth);
 
   @override
@@ -17,47 +15,60 @@ class BiometricDataSourceImpl implements BiometricDataSource {
     try {
       final isDeviceSupported = await localAuth.isDeviceSupported();
       final canCheckBiometrics = await localAuth.canCheckBiometrics;
-      final isSupported = isDeviceSupported && canCheckBiometrics;
+      final available = await localAuth.getAvailableBiometrics();
+
+      final supportsFingerprint = available.contains(BiometricType.fingerprint);
+      final supportsAnyBiometric = available.isNotEmpty;
+
       return BiometricResultModel(
-        isSupported: isSupported,
+        isSupported: isDeviceSupported && canCheckBiometrics && supportsAnyBiometric,
         isAuthenticated: false,
-        message: isSupported ? 'Biometric support available' : 'Biometric not supported',
+        message: (isDeviceSupported && canCheckBiometrics && supportsAnyBiometric)
+            ? 'Biometric support available'
+            : 'Biometric not supported',
       );
     } catch (e) {
-      throw BiometricException('Failed to check biometric support: $e');
+      return BiometricResultModel(
+        isSupported: false,
+        isAuthenticated: false,
+        message: 'Failed to check biometric support: $e',
+      );
     }
   }
 
   @override
   Future<BiometricResultModel> authenticateWithBiometrics() async {
     try {
-      final isDeviceSupported = await localAuth.isDeviceSupported();
-      final canCheckBiometrics = await localAuth.canCheckBiometrics;
-      final isSupported = isDeviceSupported && canCheckBiometrics;
+      final available = await localAuth.getAvailableBiometrics();
 
-      if (!isSupported) {
+      if (available.isEmpty) {
         return BiometricResultModel(
           isSupported: false,
           isAuthenticated: false,
-          message: 'Biometric not supported on this device',
+          message: 'No biometrics available on device',
         );
       }
 
       final authenticated = await localAuth.authenticate(
         localizedReason: 'Authenticate to enable biometric login',
-        options: const AuthenticationOptions(
+        options: AuthenticationOptions(
           biometricOnly: true,
           useErrorDialogs: true,
           stickyAuth: true,
         ),
       );
+
       return BiometricResultModel(
-        isSupported: isSupported,
+        isSupported: true,
         isAuthenticated: authenticated,
         message: authenticated ? 'Authentication successful' : 'Authentication failed',
       );
     } catch (e) {
-      throw BiometricException('Biometric authentication failed: $e');
+      return BiometricResultModel(
+        isSupported: false,
+        isAuthenticated: false,
+        message: 'Biometric authentication failed: $e',
+      );
     }
   }
 }
