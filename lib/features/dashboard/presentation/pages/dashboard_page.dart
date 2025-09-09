@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/presentation/theme/app_colors.dart';
 import '../../../transactions/presentation/bloc/transaction_bloc.dart';
@@ -95,21 +96,27 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 Column(
                   children: [
-                    Card(
-                      color: AppColors.cardBackground(context),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Image.asset(
-                          'assets/images/send.png',
-                          width: 35,
-                          height: 35,
-                          fit: BoxFit.cover,
-                          color: AppColors.textColor(context),
-                          colorBlendMode: BlendMode.srcIn,
+                    InkWell(
+                      onTap: () {
+                        context.go('/local/transfer');
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Card(
+                        color: AppColors.cardBackground(context),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Image.asset(
+                            'assets/images/send.png',
+                            width: 35,
+                            height: 35,
+                            fit: BoxFit.cover,
+                            color: AppColors.textColor(context),
+                            colorBlendMode: BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
@@ -181,31 +188,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   if (state.transactions.isEmpty) {
                     return const Center(child: Text("No transactions yet."));
                   }
-                  // return ListView.separated(
-                  //   physics: const NeverScrollableScrollPhysics(),
-                  //   shrinkWrap: true,
-                  //   itemCount: state.transactions.length,
-                  //   separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  //   itemBuilder: (context, index) {
-                  //     final t = state.transactions[index];
-                  //     return ListTile(
-                  //       leading: Icon(
-                  //         t.status == "withdrawal"
-                  //             ? Icons.arrow_upward
-                  //             : Icons.arrow_downward,
-                  //         color: t.status == "withdrawal" ? Colors.red : Colors.green,
-                  //       ),
-                  //       title: Text(t.title),
-                  //       subtitle: Text(t.date),
-                  //       trailing: Text(
-                  //         "\$${t.amount.toStringAsFixed(2)}",
-                  //         style: TextStyle(
-                  //           color: t.status == "withdrawal" ? Colors.red : Colors.green,
-                  //         ),
-                  //       ),
-                  //     );
-                  //   },
-                  // );
+
                 } else if (state is TransactionError) {
                   return Center(child: Text(state.message));
                 }

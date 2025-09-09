@@ -6,12 +6,12 @@ import '../../../../core/theme/presentation/providers/theme_notifier.dart';
 
 class AppScaffold extends StatelessWidget {
   final Widget child;
-  const AppScaffold({super.key, required this.child});
+   AppScaffold({super.key, required this.child});
 
   static final List<_NavItem> _navItems = [
     _NavItem('/dashboard', Icons.home, 'Home'),
-    _NavItem('/transfer', Icons.wallet, 'wallet'),
     _NavItem('/transactions', Icons.payment, 'Transactions'),
+    _NavItem('/about', Icons.info_outline_rounded, 'About us'),
     _NavItem('/settings', Icons.settings, 'Settings'),
   ];
 
@@ -20,15 +20,22 @@ class AppScaffold extends StatelessWidget {
     return index == -1 ? 0 : index;
   }
 
+  // List of routes where the BottomNavigationBar should be hidden
+  final List<String> _hiddenNavPaths = [
+    '/transfer',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     final selectedIndex = _locationToIndex(location);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final shouldShowNav = !_hiddenNavPaths.contains(GoRouterState.of(context).matchedLocation);
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: shouldShowNav
+          ? BottomNavigationBar(
         backgroundColor: AppColors.background(context),
         currentIndex: selectedIndex,
         onTap: (index) {
@@ -41,7 +48,8 @@ class AppScaffold extends StatelessWidget {
           label: item.label,
         ))
             .toList(),
-      ),
+      )
+          : null, // Return null to hide the BottomNavigationBar
     );
   }
 }
