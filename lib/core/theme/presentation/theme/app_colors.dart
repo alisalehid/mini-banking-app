@@ -20,8 +20,12 @@ class AppColors {
   static const Color darkBackground = Color(0xFF121212); // Dark background
   static const Color darkText = Color(0xFFE0E0E0); // Light grey text
   static const Color darkButton = Color(0xFFFFFFFF); // White buttons
-  static const Color darkTitleButton = Color(0xFFFFFFFF); // Light card background
-  static const Color darkCardBackground = Color(0xFF1C1C1C); // car dark background
+  static const Color darkTitleButton = Color(0xFFFFFFFF);
+  static const Color darkCardBackground = Color(0xFF191919);
+
+
+
+
 
 
   // ThemeData for light mode
@@ -133,9 +137,41 @@ class AppColors {
     }
 
     return themeNotifier.themeMode == AppThemeMode.dark
-        ? darkCardBackground
-        : lightCardBackground;
+        ? darkBackground
+        : lightBackground;
   }
 
+
+  static LinearGradient backgroundGradient(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
+
+    if (themeNotifier.themeMode == AppThemeMode.system) {
+      return MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? darkBackgroundGradient
+          : lightBackgroundGradient;
+    }
+
+    return themeNotifier.themeMode == AppThemeMode.dark
+        ? darkBackgroundGradient
+        : lightBackgroundGradient;
+  }
+
+  static const LinearGradient lightBackgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFFF4F4F4), // Pure white (top)
+      Color(0xFFF4F4F4), // Very light gray (middle)
+    ],
+  );
+
+  static const LinearGradient darkBackgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [
+      Color(0xFF1E1E1E), // A very dark gray/black
+      Color(0xFF0D0D0D), // Slightly lighter dark gray (bottom)
+    ],
+  );
 
 }

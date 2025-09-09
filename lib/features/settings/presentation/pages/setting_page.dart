@@ -39,153 +39,182 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.message != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message!)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message!)));
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: AppColors.background(context),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 100),
+        return  Scaffold(
+            backgroundColor: AppColors.background(context),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 100),
 
-                /// Profile card
-                Card(
-                  color: AppColors.cardBackground(context),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: ListTile(
-                      leading: const CircleAvatar(
-                        radius: 28,
-                        backgroundImage: AssetImage("assets/images/profile.png"),
-                      ),
-                      title: const Text(
-                        "John sample",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: const Text("User account"),
+                  /// Profile card
+                  Card(
+                    color: AppColors.cardBackground(context),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                /// Dark/Light mode toggle
-                Card(
-                  color: AppColors.cardBackground(context),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: SwitchListTile(
-                      title: Text(themeNotifier.themeMode == AppThemeMode.dark
-                          ? "Dark Mode"
-                          : "Light Mode"),
-                      value: themeNotifier.themeMode == AppThemeMode.dark,
-                      onChanged: (value) {
-                        themeNotifier.setThemeMode(
-                          value ? AppThemeMode.dark : AppThemeMode.light,
-                        );
-                      },
-                      activeColor: AppColors.lightAccent,
-                      inactiveThumbColor: AppColors.lightText,
-                      secondary: Icon(
-                        themeNotifier.themeMode == AppThemeMode.dark
-                            ? Icons.dark_mode
-                            : Icons.light_mode,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                /// Biometric toggle
-                Card(
-                  color: AppColors.cardBackground(context),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      children: [
-                        SwitchListTile(
-                          title: const Text("Biometric Login"),
-                          value: state.isBiometricEnabled,
-                          onChanged: state.isBiometricSupported
-                              ? (value) {
-                            context.read<AuthBloc>().add(
-                              ToggleBiometricLogin(value),
-                            );
-                          }
-                              : null,
-                          activeColor: AppColors.lightAccent,
-                          inactiveThumbColor: AppColors.lightText,
-                          secondary: Icon(
-                            Icons.fingerprint,
-                            color: Theme.of(context).colorScheme.primary,
+                    elevation: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundImage: AssetImage(
+                            "assets/images/profile.png",
                           ),
-                        ),
-                        if (!state.isBiometricSupported)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              "Biometric authentication is not available on this device",
-                              style: TextStyle(color: Colors.red),
+                          child: ClipOval(
+                            child: Image.asset(
+                              "assets/images/profile.png",
+                              fit: BoxFit
+                                  .cover, // Ensures the image scales to fit without cropping
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const Spacer(),
-
-                /// Logout button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        ),
+                        title: const Text(
+                          "Sara Smith",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          "user@test.com",
+                          style: TextStyle(color: AppColors.textColor(context)),
+                        ),
                       ),
-                      backgroundColor: Colors.red,
-                    ),
-                    onPressed: () async {
-                      // Get the LoginCubit instance
-                      final loginCubit = context.read<LoginCubit>();
-
-                      // Call logout
-                      await loginCubit.logout();
-
-                      // Optional: Navigate back to login screen
-                      Navigator.of(context).pushReplacementNamed('/login');
-                    },
-                    icon: const Icon(Icons.logout, color: Colors.white),
-                    label: const Text(
-                      "Logout",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
-                ),
-                const SizedBox(height: 50),
-              ],
+
+                  const SizedBox(height: 10),
+
+
+
+                  /// Biometric toggle / dark mode
+                  Card(
+                    color: AppColors.cardBackground(context),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          SwitchListTile(
+                            title: Text(
+                              themeNotifier.themeMode == AppThemeMode.dark
+                                  ? "Dark Mode"
+                                  : "Light Mode",
+                            ),
+                            value: themeNotifier.themeMode == AppThemeMode.dark,
+                            onChanged: (value) {
+                              themeNotifier.setThemeMode(
+                                value ? AppThemeMode.dark : AppThemeMode.light,
+                              );
+                            },
+                            activeColor: AppColors.lightAccent,
+                            inactiveThumbColor: AppColors.lightText,
+                            secondary: Icon(
+                              themeNotifier.themeMode == AppThemeMode.dark
+                                  ? Icons.dark_mode
+                                  : Icons.light_mode,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          SwitchListTile(
+                            title: Text(
+                              "Login with Fingerprint",
+                              style: TextStyle(
+                                color: AppColors.textColor(context),
+                              ),
+                            ),
+                            value: state.isBiometricEnabled,
+                            onChanged: state.isBiometricSupported
+                                ? (value) {
+                                    context.read<AuthBloc>().add(
+                                      ToggleBiometricLogin(value),
+                                    );
+                                  }
+                                : null,
+                            activeColor: AppColors.lightAccent,
+                            inactiveThumbColor: AppColors.lightText,
+                            secondary: Icon(
+                              Icons.fingerprint,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          if (!state.isBiometricSupported)
+                            const Padding(
+                              padding: EdgeInsets.all(15),
+                              child: Text(
+                                "Biometric authentication is not available on this device",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+
+                          SizedBox(height: 50,) ,
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF4A90E2),
+                                    Color(0xFFFF5F6D), // Red
+
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    backgroundColor: Colors.transparent, // no solid color
+                                    foregroundColor: AppColors.textColor(context), // red text & icon
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    final loginCubit = context.read<LoginCubit>();
+                                    await loginCubit.logout();
+                                    Navigator.of(context).pushReplacementNamed('/login');
+                                  },
+                                  icon: const Icon(Icons.logout , color: Colors.white,),
+                                  label: const Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 5) ,
+
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 50),
+                ],
+              ),
             ),
-          ),
         );
       },
     );

@@ -7,12 +7,17 @@ class TransferPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background(context),
-      body: const Center(
-        child: Text(
-          "transfer",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Container(
+      decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context)
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: const Center(
+          child: Text(
+            "transfer",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
