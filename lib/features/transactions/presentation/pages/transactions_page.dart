@@ -125,7 +125,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       highlightColor: Colors.grey.shade100,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
-                        itemCount: 4, // Show a fixed number of placeholder items
+                        itemCount: 10, // Show a fixed number of placeholder items
                         separatorBuilder: (_, __) => const SizedBox(width: 8),
                         itemBuilder: (context, index) {
                           return const AccountFilterShimmer();

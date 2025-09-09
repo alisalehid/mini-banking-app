@@ -26,7 +26,7 @@ GoRouter createRouter(LoginCubit authCubit) {
           ),
           GoRoute(
             path: '/transfer',
-            builder: (_, __) => const TransferPage(),
+            builder: (_, __) => const MoneyTransferPage(),
           ),
           GoRoute(
             path: '/transactions',

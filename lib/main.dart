@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+
 import 'app/router.dart';
 import 'core/theme/data/repositories/theme_repository.dart';
 import 'core/theme/domain/entities/theme_mode.dart';
@@ -33,17 +34,21 @@ class _MyAppState extends State<MyApp> {
   late final LoginCubit _authCubit;
   late final AuthBloc _authBloc;
   late final GoRouter _appRouter;
-
   late final TransactionBloc _transactionBloc;
 
   @override
   void initState() {
     super.initState();
+
+    // Auth cubit and bloc
     _authCubit = sl<LoginCubit>();
     _authCubit.initialize();
     _authBloc = sl<AuthBloc>();
+
+    // Router
     _appRouter = createRouter(_authCubit);
 
+    // Transaction bloc
     final dio = Dio();
     final remoteDataSource = TransactionRemoteDataSource(dio);
     final repository = TransactionRepositoryImpl(remoteDataSource);
