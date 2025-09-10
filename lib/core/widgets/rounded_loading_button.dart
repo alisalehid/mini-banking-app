@@ -52,6 +52,7 @@ class CustomGradientLoadingButton extends StatelessWidget {
       controller: controller,
       disabledColor: Colors.transparent,
       onPressed: onTap,
+      indicatorColor: indicatorColor, // 👈 pass down
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -77,6 +78,7 @@ class _GradientLoadingButton extends StatefulWidget {
     required this.onPressed,
     required this.child,
     required this.gradientColors,
+    required this.indicatorColor,
     this.height = 50,
     this.width = 300,
     this.borderRadius = 100,
@@ -93,6 +95,7 @@ class _GradientLoadingButton extends StatefulWidget {
   final double borderRadius;
   final bool animateOnTap;
   final Color? disabledColor;
+  final Color indicatorColor;
 
   @override
   State<_GradientLoadingButton> createState() => _GradientLoadingButtonState();
@@ -128,8 +131,7 @@ class _GradientLoadingButtonState extends State<_GradientLoadingButton>
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap:
-                        widget.onPressed == null || state == ButtonState.loading
+                    onTap: widget.onPressed == null || state == ButtonState.loading
                         ? null
                         : _onTap,
                     borderRadius: BorderRadius.circular(widget.borderRadius),
@@ -139,11 +141,11 @@ class _GradientLoadingButtonState extends State<_GradientLoadingButton>
                       alignment: Alignment.center,
                       child: state == ButtonState.loading
                           ? CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.titleButtonColor(context),
-                              ),
-                              strokeWidth: 2.0,
-                            )
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          widget.indicatorColor, // 👈 use custom color
+                        ),
+                        strokeWidth: 2.0,
+                      )
                           : widget.child,
                     ),
                   ),
@@ -211,6 +213,7 @@ class CustomLoadingButton extends StatelessWidget {
       animateOnTap: false,
       controller: controller,
       disabledColor: Colors.transparent,
+      indicatorColor: indicatorColor, // 👈 pass down
       onPressed: onTap,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -253,6 +256,7 @@ class _RoundedLoadingButton extends StatefulWidget {
   final IconData failedIcon;
   final Curve completionCurve;
   final Duration completionDuration;
+  final Color indicatorColor; // 👈 added
 
   Duration get _borderDuration {
     return Duration(milliseconds: (duration.inMilliseconds / 2).round());
@@ -283,6 +287,7 @@ class _RoundedLoadingButton extends StatefulWidget {
     this.completionCurve = Curves.elasticOut,
     this.completionDuration = const Duration(milliseconds: 1000),
     this.disabledColor,
+    this.indicatorColor = Colors.white, // 👈 default
   }) : super(key: key);
 
   @override
@@ -338,7 +343,9 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
     Widget _loader = SizedBox(
       height: widget.loaderSize,
       width: widget.loaderSize,
-      child:  CupertinoActivityIndicator(color: AppColors.titleButtonColor(context)),
+      child: CupertinoActivityIndicator(
+        color: widget.indicatorColor, // 👈 use custom color
+      ),
     );
 
     Widget childStream = StreamBuilder(
@@ -404,9 +411,9 @@ class _RoundedLoadingButtonState extends State<_RoundedLoadingButton>
     )..addListener(() => setState(() {}));
 
     _squeezeAnimation =
-        Tween<double>(begin: widget.width, end: widget.height).animate(
-          CurvedAnimation(parent: _buttonController, curve: widget.curve),
-        )..addListener(() => setState(() {}));
+    Tween<double>(begin: widget.width, end: widget.height).animate(
+      CurvedAnimation(parent: _buttonController, curve: widget.curve),
+    )..addListener(() => setState(() {}));
 
     _squeezeAnimation.addStatusListener((state) {
       if (state == AnimationStatus.completed && widget.animateOnTap) {
@@ -494,12 +501,12 @@ class RoundedLoadingButtonController {
   VoidCallback? _resetListener;
 
   void _addListeners(
-    VoidCallback startListener,
-    VoidCallback stopListener,
-    VoidCallback successListener,
-    VoidCallback errorListener,
-    VoidCallback resetListener,
-  ) {
+      VoidCallback startListener,
+      VoidCallback stopListener,
+      VoidCallback successListener,
+      VoidCallback errorListener,
+      VoidCallback resetListener,
+      ) {
     _startListener = startListener;
     _stopListener = stopListener;
     _successListener = successListener;
@@ -508,7 +515,7 @@ class RoundedLoadingButtonController {
   }
 
   final BehaviorSubject<ButtonState> _state =
-      BehaviorSubject<ButtonState>.seeded(ButtonState.idle);
+  BehaviorSubject<ButtonState>.seeded(ButtonState.idle);
 
   Stream<ButtonState> get stateStream => _state.stream;
 

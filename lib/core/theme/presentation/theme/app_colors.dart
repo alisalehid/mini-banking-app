@@ -20,7 +20,7 @@ class AppColors {
   static const Color darkBackground = Color(0xFF121212); // Dark background
   static const Color darkText = Color(0xFFE0E0E0); // Light grey text
   static const Color darkButton = Color(0xFFFFFFFF); // White buttons
-  static const Color darkTitleButton = Color(0xFFFFFFFF);
+  static const Color darkTitleButton = Color(0xFF303030);
   static const Color darkCardBackground = Color(0xFF191919);
 
 
