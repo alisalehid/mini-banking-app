@@ -4,7 +4,6 @@ import '../core/widgets/app_scaffold.dart';
 import '../features/about_us/presentation/page/about_us.dart';
 import '../features/auth/presentation/bloc/login_cubit.dart';
 import '../features/auth/presentation/pages/login_page.dart';
-import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/local_transactions/presentation/pages/local_transactions_dashboard_page.dart';
 import '../features/local_transactions/presentation/pages/local_transactions_transfer_page.dart';
 import '../features/transactions/presentation/pages/transactions_page.dart';
@@ -23,10 +22,6 @@ GoRouter createRouter(LoginCubit authCubit) {
       ShellRoute(
         builder: (context, state, child) => AppScaffold(child: child),
         routes: [
-          GoRoute(
-            path: '/dashboard',
-            builder: (_, __) => const DashboardPage(),
-          ),
           GoRoute(
             path: '/transfer',
             builder: (_, __) => const MoneyTransferPage(),
@@ -49,7 +44,7 @@ GoRouter createRouter(LoginCubit authCubit) {
           ),
           GoRoute(
             path: '/local/transfer',
-            builder: (_, __) => const LocalTransactionsTransferPage(),
+            builder: (_, __) =>  LocalTransactionsTransferPage(),
           ),
         ],
       ),
@@ -62,7 +57,7 @@ GoRouter createRouter(LoginCubit authCubit) {
         return isLoggingIn ? null : '/login';
       }
       if (isLoggedIn && isLoggingIn) {
-        return '/dashboard';
+        return '/local/dashboard';
       }
       return null;
     },

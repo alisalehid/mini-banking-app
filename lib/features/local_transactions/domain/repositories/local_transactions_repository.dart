@@ -8,7 +8,8 @@ abstract class LocalTransactionsRepository {
   /// Deducts [amountCents] from balance and inserts a negative transaction.
   Future<(LocalTransactionsBalanceEntity, LocalTransactionsTransactionEntity)> sendMoney({
     required String beneficiaryName,
-    required String accountNumber,
-    required int amountCents,
+    required String account,
+    required String amount,
+    required String status,
   });
 }

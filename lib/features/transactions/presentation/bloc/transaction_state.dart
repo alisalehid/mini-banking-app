@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../domain/entities/transaction.dart';
+import '../../../local_transactions/domain/entities/dashboard_transaction.dart';
 
 abstract class TransactionState extends Equatable {
   @override
@@ -11,7 +11,7 @@ class TransactionInitial extends TransactionState {}
 class TransactionLoading extends TransactionState {}
 
 class TransactionLoaded extends TransactionState {
-  final List<Transaction> transactions;
+  final List<DashboardTransaction> transactions;
 
   TransactionLoaded(this.transactions);
 

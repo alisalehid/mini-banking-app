@@ -107,6 +107,7 @@ class _LoginViewState extends State<_LoginView> {
                   // 🔹 Username/password fields
                   CustomTextField(
                     label: "Username",
+                    icon: Icons.account_circle_outlined,
                     controller: _usernameController,
                     hint: "Enter username",
                     errorText: state.usernameError,
@@ -115,6 +116,7 @@ class _LoginViewState extends State<_LoginView> {
                   const SizedBox(height: 16),
                   CustomTextField(
                     label: "Password",
+                    icon: Icons.lock,
                     controller: _passwordController,
                     hint: "Enter password",
                     obscureText: true,
@@ -123,7 +125,6 @@ class _LoginViewState extends State<_LoginView> {
                   ),
                   const SizedBox(height: 40),
 
-                  // 🔑 Login button
                   CustomLoadingButton(
                     controller: _loadingController,
                     title: "Login",

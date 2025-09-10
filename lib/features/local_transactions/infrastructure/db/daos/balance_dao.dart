@@ -8,22 +8,22 @@ part 'balance_dao.g.dart';
 class BalanceDao extends DatabaseAccessor<LocalTransactionsDb> with _$BalanceDaoMixin {
   BalanceDao(LocalTransactionsDb db) : super(db);
 
-  Future<int> getAmountCents() async {
+  Future<int> getAmount() async {
     final row = await (select(balances)..limit(1)).getSingleOrNull();
-    return row?.amountCents ?? 0;
+    return row?.amount ?? 0;
   }
 
-  Future<void> upsertAmountCents(int newAmount) async {
+  Future<void> upsertAmount(int newAmount) async {
     final row = await (select(balances)..limit(1)).getSingleOrNull();
     if (row == null) {
       await into(balances).insert(
         BalancesCompanion(
-          amountCents: Value(newAmount),
+          amount: Value(newAmount),
         ),
       );
     } else {
       await (update(balances)..where((tbl) => tbl.id.equals(row.id)))
-          .write(BalancesCompanion(amountCents: Value(newAmount)));
+          .write(BalancesCompanion(amount: Value(newAmount)));
     }
   }
 }

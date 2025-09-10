@@ -1,32 +1,32 @@
-import 'package:equatable/equatable.dart';
+import '../../../domain/entities/dashboard_transaction.dart';
 import '../../../domain/entities/local_transactions_balance_entity.dart';
-import '../../../domain/entities/local_transactions_transaction_entity.dart';
 
-class LocalTransactionsDashboardState extends Equatable {
+class LocalTransactionsDashboardState {
   final bool loading;
   final LocalTransactionsBalanceEntity? balance;
-  final List<LocalTransactionsTransactionEntity> transactions;
+  final List<DashboardTransaction> transactions;
   final String? error;
 
-  const LocalTransactionsDashboardState({
+  LocalTransactionsDashboardState({
     required this.loading,
     required this.balance,
     required this.transactions,
     required this.error,
   });
 
-  factory LocalTransactionsDashboardState.initial() =>
-      const LocalTransactionsDashboardState(
-        loading: false,
-        balance: null,
-        transactions: [],
-        error: null,
-      );
+  factory LocalTransactionsDashboardState.initial() {
+    return LocalTransactionsDashboardState(
+      loading: false,
+      balance: null,
+      transactions: [],
+      error: null,
+    );
+  }
 
   LocalTransactionsDashboardState copyWith({
     bool? loading,
     LocalTransactionsBalanceEntity? balance,
-    List<LocalTransactionsTransactionEntity>? transactions,
+    List<DashboardTransaction>? transactions,
     String? error,
   }) {
     return LocalTransactionsDashboardState(
@@ -36,7 +36,4 @@ class LocalTransactionsDashboardState extends Equatable {
       error: error,
     );
   }
-
-  @override
-  List<Object?> get props => [loading, balance?.amountCents, transactions, error];
 }

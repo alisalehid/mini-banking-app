@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mini_banking_app/core/theme/presentation/theme/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -8,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final ValueChanged<String> onChanged;
+  final IconData? icon; // 👈 added for icon
 
   const CustomTextField({
     super.key,
@@ -18,6 +20,7 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
+    this.icon, // 👈 added
   });
 
   @override
@@ -35,19 +38,22 @@ class CustomTextField extends StatelessWidget {
         errorText: errorText,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         filled: true,
-        fillColor: theme.colorScheme.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: AppColors.cardBackground(context),
+        prefixIcon: icon != null ? Icon(icon, color: theme.iconTheme.color) : null,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+
+        // Border styles
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: theme.dividerColor),
+          borderSide: BorderSide(color: theme.colorScheme.surface),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: theme.dividerColor),
+          borderSide: BorderSide(color: theme.colorScheme.surface),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+          borderSide: const BorderSide(color: Colors.green, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),

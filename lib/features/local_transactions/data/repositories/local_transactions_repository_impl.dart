@@ -20,8 +20,8 @@ class LocalTransactionsRepositoryImpl implements LocalTransactionsRepository {
 
   @override
   Future<LocalTransactionsBalanceEntity> getBalance() async {
-    final cents = await balanceDao.getAmountCents();
-    return mapAmountCentsToEntity(cents);
+    final cents = await balanceDao.getAmount();
+    return mapAmountCentsToEntity(cents.toString());
   }
 
   @override
@@ -33,10 +33,11 @@ class LocalTransactionsRepositoryImpl implements LocalTransactionsRepository {
   @override
   Future<(LocalTransactionsBalanceEntity, LocalTransactionsTransactionEntity)> sendMoney({
     required String beneficiaryName,
-    required String accountNumber,
-    required int amountCents,
+    required String amount,
+    required String status ,
+    required String account ,
   }) async {
-    if (amountCents <= 0) {
+    if (parseNumber(amount) <= 0) {
       throw ArgumentError('Amount must be greater than 0');
     }
     // Mask last 4 digits
@@ -47,32 +48,49 @@ class LocalTransactionsRepositoryImpl implements LocalTransactionsRepository {
     }
 
     return await db.transaction(() async {
-      final current = await balanceDao.getAmountCents();
-      if (amountCents > current) {
+      final current = await balanceDao.getAmount();
+      final amountNum = parseNumber(amount);
+      if (amountNum > current) {
         throw StateError('Insufficient balance');
       }
 
-      final newBalance = current - amountCents;
-      await balanceDao.upsertAmountCents(newBalance);
+      final newBalance = current - amountNum;
+      await balanceDao.upsertAmount(parseNumber(newBalance.toString()));
 
-      final description = 'Transfer to $beneficiaryName (${maskAcc(accountNumber)})';
+      final description = 'Transfer to $beneficiaryName (${maskAcc(account)})';
+      final amountInt = amountNum.toInt();
+
       final id = await transactionDao.insertTransaction(
         date: DateTime.now(),
         description: description,
-        amountCents: -amountCents, // debit
+        amount: -amountInt,
+        status : status ,
+        account: account
       );
 
       final txnRow = LocalTxn(
         id: id,
         date: DateTime.now(),
         description: description,
-        amountCents: -amountCents,
+        amount: -amountInt,
+        status: status ,
+        account: account
       );
 
       return (
-      LocalTransactionsBalanceEntity(newBalance),
+      LocalTransactionsBalanceEntity(newBalance.toString()),
       mapLocalTxnRowToEntity(txnRow),
       );
     });
+  }
+
+  dynamic parseNumber(String value) {
+    double parsed = double.parse(value);
+    // If it has no decimal part, return int
+    if (parsed % 1 == 0) {
+      return parsed.toInt();
+    } else {
+      return parsed;
+    }
   }
 }

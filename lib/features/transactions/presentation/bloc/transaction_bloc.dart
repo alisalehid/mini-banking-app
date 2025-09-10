@@ -1,7 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mini_banking_app/features/local_transactions/domain/entities/local_transactions_transaction_entity.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';
 import '../../domain/usecases/get_transactions.dart';
+import '../../data/models/transaction_model.dart';
+
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final GetTransactions getTransactions;
@@ -14,9 +17,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       LoadTransactions event, Emitter<TransactionState> emit) async {
     emit(TransactionLoading());
     try {
-      // Fetch ALL transactions (no pagination)
-      final transactions = await getTransactions(1, 1000);
-      emit(TransactionLoaded(transactions));
+      final dashboardTransactions = await getTransactions(event.page, event.limit);
+
+      emit(TransactionLoaded(dashboardTransactions)); // Already DashboardTransaction
     } catch (e) {
       emit(TransactionError(e.toString()));
     }

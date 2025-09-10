@@ -8,13 +8,15 @@ class SendLocalTransactionsMoney {
 
   Future<(LocalTransactionsBalanceEntity, LocalTransactionsTransactionEntity)> call({
     required String beneficiaryName,
-    required String accountNumber,
-    required int amountCents,
+    required String account,
+    required String amount,
+    required String status,
   }) {
     return repo.sendMoney(
       beneficiaryName: beneficiaryName,
-      accountNumber: accountNumber,
-      amountCents: amountCents,
+      account: account,
+      amount: amount,
+      status: status
     );
   }
 }

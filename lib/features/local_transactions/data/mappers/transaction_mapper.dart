@@ -6,6 +6,8 @@ LocalTransactionsTransactionEntity mapLocalTxnRowToEntity(LocalTxn row) {
     id: row.id,
     date: row.date,
     description: row.description,
-    amountCents: row.amountCents,
+    amount: row.amount.toString(),
+    status: row.status ,
+    account: row.account
   );
 }

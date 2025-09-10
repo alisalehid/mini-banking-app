@@ -21,12 +21,10 @@ class $BalancesTable extends Balances with TableInfo<$BalancesTable, Balance> {
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
-  static const VerificationMeta _amountCentsMeta = const VerificationMeta(
-    'amountCents',
-  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
   @override
-  late final GeneratedColumn<int> amountCents = GeneratedColumn<int>(
-    'amount_cents',
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
+    'amount',
     aliasedName,
     false,
     type: DriftSqlType.int,
@@ -34,7 +32,7 @@ class $BalancesTable extends Balances with TableInfo<$BalancesTable, Balance> {
     defaultValue: const Constant(0),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, amountCents];
+  List<GeneratedColumn> get $columns => [id, amount];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -50,13 +48,10 @@ class $BalancesTable extends Balances with TableInfo<$BalancesTable, Balance> {
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('amount_cents')) {
+    if (data.containsKey('amount')) {
       context.handle(
-        _amountCentsMeta,
-        amountCents.isAcceptableOrUnknown(
-          data['amount_cents']!,
-          _amountCentsMeta,
-        ),
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
       );
     }
     return context;
@@ -72,9 +67,9 @@ class $BalancesTable extends Balances with TableInfo<$BalancesTable, Balance> {
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
-      amountCents: attachedDatabase.typeMapping.read(
+      amount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}amount_cents'],
+        data['${effectivePrefix}amount'],
       )!,
     );
   }
@@ -87,18 +82,18 @@ class $BalancesTable extends Balances with TableInfo<$BalancesTable, Balance> {
 
 class Balance extends DataClass implements Insertable<Balance> {
   final int id;
-  final int amountCents;
-  const Balance({required this.id, required this.amountCents});
+  final int amount;
+  const Balance({required this.id, required this.amount});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['amount_cents'] = Variable<int>(amountCents);
+    map['amount'] = Variable<int>(amount);
     return map;
   }
 
   BalancesCompanion toCompanion(bool nullToAbsent) {
-    return BalancesCompanion(id: Value(id), amountCents: Value(amountCents));
+    return BalancesCompanion(id: Value(id), amount: Value(amount));
   }
 
   factory Balance.fromJson(
@@ -108,7 +103,7 @@ class Balance extends DataClass implements Insertable<Balance> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Balance(
       id: serializer.fromJson<int>(json['id']),
-      amountCents: serializer.fromJson<int>(json['amountCents']),
+      amount: serializer.fromJson<int>(json['amount']),
     );
   }
   @override
@@ -116,18 +111,16 @@ class Balance extends DataClass implements Insertable<Balance> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'amountCents': serializer.toJson<int>(amountCents),
+      'amount': serializer.toJson<int>(amount),
     };
   }
 
-  Balance copyWith({int? id, int? amountCents}) =>
-      Balance(id: id ?? this.id, amountCents: amountCents ?? this.amountCents);
+  Balance copyWith({int? id, int? amount}) =>
+      Balance(id: id ?? this.id, amount: amount ?? this.amount);
   Balance copyWithCompanion(BalancesCompanion data) {
     return Balance(
       id: data.id.present ? data.id.value : this.id,
-      amountCents: data.amountCents.present
-          ? data.amountCents.value
-          : this.amountCents,
+      amount: data.amount.present ? data.amount.value : this.amount,
     );
   }
 
@@ -135,47 +128,42 @@ class Balance extends DataClass implements Insertable<Balance> {
   String toString() {
     return (StringBuffer('Balance(')
           ..write('id: $id, ')
-          ..write('amountCents: $amountCents')
+          ..write('amount: $amount')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, amountCents);
+  int get hashCode => Object.hash(id, amount);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Balance &&
-          other.id == this.id &&
-          other.amountCents == this.amountCents);
+      (other is Balance && other.id == this.id && other.amount == this.amount);
 }
 
 class BalancesCompanion extends UpdateCompanion<Balance> {
   final Value<int> id;
-  final Value<int> amountCents;
+  final Value<int> amount;
   const BalancesCompanion({
     this.id = const Value.absent(),
-    this.amountCents = const Value.absent(),
+    this.amount = const Value.absent(),
   });
   BalancesCompanion.insert({
     this.id = const Value.absent(),
-    this.amountCents = const Value.absent(),
+    this.amount = const Value.absent(),
   });
   static Insertable<Balance> custom({
     Expression<int>? id,
-    Expression<int>? amountCents,
+    Expression<int>? amount,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (amountCents != null) 'amount_cents': amountCents,
+      if (amount != null) 'amount': amount,
     });
   }
 
-  BalancesCompanion copyWith({Value<int>? id, Value<int>? amountCents}) {
-    return BalancesCompanion(
-      id: id ?? this.id,
-      amountCents: amountCents ?? this.amountCents,
-    );
+  BalancesCompanion copyWith({Value<int>? id, Value<int>? amount}) {
+    return BalancesCompanion(id: id ?? this.id, amount: amount ?? this.amount);
   }
 
   @override
@@ -184,8 +172,8 @@ class BalancesCompanion extends UpdateCompanion<Balance> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (amountCents.present) {
-      map['amount_cents'] = Variable<int>(amountCents.value);
+    if (amount.present) {
+      map['amount'] = Variable<int>(amount.value);
     }
     return map;
   }
@@ -194,7 +182,7 @@ class BalancesCompanion extends UpdateCompanion<Balance> {
   String toString() {
     return (StringBuffer('BalancesCompanion(')
           ..write('id: $id, ')
-          ..write('amountCents: $amountCents')
+          ..write('amount: $amount')
           ..write(')'))
         .toString();
   }
@@ -239,19 +227,44 @@ class $LocalTxnsTable extends LocalTxns
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _amountCentsMeta = const VerificationMeta(
-    'amountCents',
-  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
   @override
-  late final GeneratedColumn<int> amountCents = GeneratedColumn<int>(
-    'amount_cents',
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
+    'amount',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
-  List<GeneratedColumn> get $columns => [id, date, description, amountCents];
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accountMeta = const VerificationMeta(
+    'account',
+  );
+  @override
+  late final GeneratedColumn<String> account = GeneratedColumn<String>(
+    'account',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    description,
+    amount,
+    status,
+    account,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -286,16 +299,29 @@ class $LocalTxnsTable extends LocalTxns
     } else if (isInserting) {
       context.missing(_descriptionMeta);
     }
-    if (data.containsKey('amount_cents')) {
+    if (data.containsKey('amount')) {
       context.handle(
-        _amountCentsMeta,
-        amountCents.isAcceptableOrUnknown(
-          data['amount_cents']!,
-          _amountCentsMeta,
-        ),
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
       );
     } else if (isInserting) {
-      context.missing(_amountCentsMeta);
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('account')) {
+      context.handle(
+        _accountMeta,
+        account.isAcceptableOrUnknown(data['account']!, _accountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_accountMeta);
     }
     return context;
   }
@@ -318,9 +344,17 @@ class $LocalTxnsTable extends LocalTxns
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       )!,
-      amountCents: attachedDatabase.typeMapping.read(
+      amount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}amount_cents'],
+        data['${effectivePrefix}amount'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      account: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account'],
       )!,
     );
   }
@@ -335,12 +369,16 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
   final int id;
   final DateTime date;
   final String description;
-  final int amountCents;
+  final int amount;
+  final String status;
+  final String account;
   const LocalTxn({
     required this.id,
     required this.date,
     required this.description,
-    required this.amountCents,
+    required this.amount,
+    required this.status,
+    required this.account,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -348,7 +386,9 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
     map['id'] = Variable<int>(id);
     map['date'] = Variable<DateTime>(date);
     map['description'] = Variable<String>(description);
-    map['amount_cents'] = Variable<int>(amountCents);
+    map['amount'] = Variable<int>(amount);
+    map['status'] = Variable<String>(status);
+    map['account'] = Variable<String>(account);
     return map;
   }
 
@@ -357,7 +397,9 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
       id: Value(id),
       date: Value(date),
       description: Value(description),
-      amountCents: Value(amountCents),
+      amount: Value(amount),
+      status: Value(status),
+      account: Value(account),
     );
   }
 
@@ -370,7 +412,9 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
       id: serializer.fromJson<int>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
       description: serializer.fromJson<String>(json['description']),
-      amountCents: serializer.fromJson<int>(json['amountCents']),
+      amount: serializer.fromJson<int>(json['amount']),
+      status: serializer.fromJson<String>(json['status']),
+      account: serializer.fromJson<String>(json['account']),
     );
   }
   @override
@@ -380,7 +424,9 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
       'id': serializer.toJson<int>(id),
       'date': serializer.toJson<DateTime>(date),
       'description': serializer.toJson<String>(description),
-      'amountCents': serializer.toJson<int>(amountCents),
+      'amount': serializer.toJson<int>(amount),
+      'status': serializer.toJson<String>(status),
+      'account': serializer.toJson<String>(account),
     };
   }
 
@@ -388,12 +434,16 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
     int? id,
     DateTime? date,
     String? description,
-    int? amountCents,
+    int? amount,
+    String? status,
+    String? account,
   }) => LocalTxn(
     id: id ?? this.id,
     date: date ?? this.date,
     description: description ?? this.description,
-    amountCents: amountCents ?? this.amountCents,
+    amount: amount ?? this.amount,
+    status: status ?? this.status,
+    account: account ?? this.account,
   );
   LocalTxn copyWithCompanion(LocalTxnsCompanion data) {
     return LocalTxn(
@@ -402,9 +452,9 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
       description: data.description.present
           ? data.description.value
           : this.description,
-      amountCents: data.amountCents.present
-          ? data.amountCents.value
-          : this.amountCents,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      status: data.status.present ? data.status.value : this.status,
+      account: data.account.present ? data.account.value : this.account,
     );
   }
 
@@ -414,13 +464,16 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('description: $description, ')
-          ..write('amountCents: $amountCents')
+          ..write('amount: $amount, ')
+          ..write('status: $status, ')
+          ..write('account: $account')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, date, description, amountCents);
+  int get hashCode =>
+      Object.hash(id, date, description, amount, status, account);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -428,39 +481,53 @@ class LocalTxn extends DataClass implements Insertable<LocalTxn> {
           other.id == this.id &&
           other.date == this.date &&
           other.description == this.description &&
-          other.amountCents == this.amountCents);
+          other.amount == this.amount &&
+          other.status == this.status &&
+          other.account == this.account);
 }
 
 class LocalTxnsCompanion extends UpdateCompanion<LocalTxn> {
   final Value<int> id;
   final Value<DateTime> date;
   final Value<String> description;
-  final Value<int> amountCents;
+  final Value<int> amount;
+  final Value<String> status;
+  final Value<String> account;
   const LocalTxnsCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
     this.description = const Value.absent(),
-    this.amountCents = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.status = const Value.absent(),
+    this.account = const Value.absent(),
   });
   LocalTxnsCompanion.insert({
     this.id = const Value.absent(),
     required DateTime date,
     required String description,
-    required int amountCents,
+    required int amount,
+    required String status,
+    required String account,
   }) : date = Value(date),
        description = Value(description),
-       amountCents = Value(amountCents);
+       amount = Value(amount),
+       status = Value(status),
+       account = Value(account);
   static Insertable<LocalTxn> custom({
     Expression<int>? id,
     Expression<DateTime>? date,
     Expression<String>? description,
-    Expression<int>? amountCents,
+    Expression<int>? amount,
+    Expression<String>? status,
+    Expression<String>? account,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (date != null) 'date': date,
       if (description != null) 'description': description,
-      if (amountCents != null) 'amount_cents': amountCents,
+      if (amount != null) 'amount': amount,
+      if (status != null) 'status': status,
+      if (account != null) 'account': account,
     });
   }
 
@@ -468,13 +535,17 @@ class LocalTxnsCompanion extends UpdateCompanion<LocalTxn> {
     Value<int>? id,
     Value<DateTime>? date,
     Value<String>? description,
-    Value<int>? amountCents,
+    Value<int>? amount,
+    Value<String>? status,
+    Value<String>? account,
   }) {
     return LocalTxnsCompanion(
       id: id ?? this.id,
       date: date ?? this.date,
       description: description ?? this.description,
-      amountCents: amountCents ?? this.amountCents,
+      amount: amount ?? this.amount,
+      status: status ?? this.status,
+      account: account ?? this.account,
     );
   }
 
@@ -490,8 +561,14 @@ class LocalTxnsCompanion extends UpdateCompanion<LocalTxn> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
-    if (amountCents.present) {
-      map['amount_cents'] = Variable<int>(amountCents.value);
+    if (amount.present) {
+      map['amount'] = Variable<int>(amount.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (account.present) {
+      map['account'] = Variable<String>(account.value);
     }
     return map;
   }
@@ -502,7 +579,9 @@ class LocalTxnsCompanion extends UpdateCompanion<LocalTxn> {
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('description: $description, ')
-          ..write('amountCents: $amountCents')
+          ..write('amount: $amount, ')
+          ..write('status: $status, ')
+          ..write('account: $account')
           ..write(')'))
         .toString();
   }
@@ -521,9 +600,9 @@ abstract class _$LocalTransactionsDb extends GeneratedDatabase {
 }
 
 typedef $$BalancesTableCreateCompanionBuilder =
-    BalancesCompanion Function({Value<int> id, Value<int> amountCents});
+    BalancesCompanion Function({Value<int> id, Value<int> amount});
 typedef $$BalancesTableUpdateCompanionBuilder =
-    BalancesCompanion Function({Value<int> id, Value<int> amountCents});
+    BalancesCompanion Function({Value<int> id, Value<int> amount});
 
 class $$BalancesTableFilterComposer
     extends Composer<_$LocalTransactionsDb, $BalancesTable> {
@@ -539,8 +618,8 @@ class $$BalancesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get amountCents => $composableBuilder(
-    column: $table.amountCents,
+  ColumnFilters<int> get amount => $composableBuilder(
+    column: $table.amount,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -559,8 +638,8 @@ class $$BalancesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get amountCents => $composableBuilder(
-    column: $table.amountCents,
+  ColumnOrderings<int> get amount => $composableBuilder(
+    column: $table.amount,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -577,10 +656,8 @@ class $$BalancesTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get amountCents => $composableBuilder(
-    column: $table.amountCents,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
 }
 
 class $$BalancesTableTableManager
@@ -615,13 +692,13 @@ class $$BalancesTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int> amountCents = const Value.absent(),
-              }) => BalancesCompanion(id: id, amountCents: amountCents),
+                Value<int> amount = const Value.absent(),
+              }) => BalancesCompanion(id: id, amount: amount),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int> amountCents = const Value.absent(),
-              }) => BalancesCompanion.insert(id: id, amountCents: amountCents),
+                Value<int> amount = const Value.absent(),
+              }) => BalancesCompanion.insert(id: id, amount: amount),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
@@ -649,14 +726,18 @@ typedef $$LocalTxnsTableCreateCompanionBuilder =
       Value<int> id,
       required DateTime date,
       required String description,
-      required int amountCents,
+      required int amount,
+      required String status,
+      required String account,
     });
 typedef $$LocalTxnsTableUpdateCompanionBuilder =
     LocalTxnsCompanion Function({
       Value<int> id,
       Value<DateTime> date,
       Value<String> description,
-      Value<int> amountCents,
+      Value<int> amount,
+      Value<String> status,
+      Value<String> account,
     });
 
 class $$LocalTxnsTableFilterComposer
@@ -683,8 +764,18 @@ class $$LocalTxnsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get amountCents => $composableBuilder(
-    column: $table.amountCents,
+  ColumnFilters<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get account => $composableBuilder(
+    column: $table.account,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -713,8 +804,18 @@ class $$LocalTxnsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get amountCents => $composableBuilder(
-    column: $table.amountCents,
+  ColumnOrderings<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get account => $composableBuilder(
+    column: $table.account,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -739,10 +840,14 @@ class $$LocalTxnsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get amountCents => $composableBuilder(
-    column: $table.amountCents,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get account =>
+      $composableBuilder(column: $table.account, builder: (column) => column);
 }
 
 class $$LocalTxnsTableTableManager
@@ -779,24 +884,32 @@ class $$LocalTxnsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<String> description = const Value.absent(),
-                Value<int> amountCents = const Value.absent(),
+                Value<int> amount = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String> account = const Value.absent(),
               }) => LocalTxnsCompanion(
                 id: id,
                 date: date,
                 description: description,
-                amountCents: amountCents,
+                amount: amount,
+                status: status,
+                account: account,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime date,
                 required String description,
-                required int amountCents,
+                required int amount,
+                required String status,
+                required String account,
               }) => LocalTxnsCompanion.insert(
                 id: id,
                 date: date,
                 description: description,
-                amountCents: amountCents,
+                amount: amount,
+                status: status,
+                account: account,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -1,6 +1,6 @@
 // lib/src/features/dashboard/presentation/widgets/navigation_button.dart
 import 'package:flutter/material.dart';
-import '../../../../core/theme/presentation/theme/app_colors.dart';
+import '../theme/presentation/theme/app_colors.dart';
 
 class NavigationButton extends StatelessWidget {
   final String label;

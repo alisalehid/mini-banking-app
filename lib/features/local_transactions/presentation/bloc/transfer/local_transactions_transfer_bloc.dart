@@ -27,7 +27,7 @@ class LocalTransactionsTransferBloc
   Future<void> _onStart(LocalTransactionsTransferStarted event,
       Emitter<LocalTransactionsTransferState> emit) async {
     final bal = await getBalance();
-    emit(state.copyWith(currentBalanceCents: bal.amountCents));
+    emit(state.copyWith(currentBalanceCents: parseNumber(bal.amount)));
   }
 
   void _onBeneficiary(LocalTransactionsBeneficiaryChanged e,
@@ -80,8 +80,9 @@ class LocalTransactionsTransferBloc
 
       await sendMoney(
         beneficiaryName: state.beneficiary.trim(),
-        accountNumber: state.accountNumber.replaceAll(' ', ''),
-        amountCents: cents,
+        account: state.accountNumber.replaceAll(' ', ''),
+        amount: cents.toString(),
+        status: "withdrawal"
       );
 
       emit(state.copyWith(submitting: false, success: true));
@@ -91,6 +92,17 @@ class LocalTransactionsTransferBloc
       emit(state.copyWith(submitting: false, error: e.toString()));
     }
   }
+
+  dynamic parseNumber(String value) {
+    double parsed = double.parse(value);
+    // If it has no decimal part, return int
+    if (parsed % 1 == 0) {
+      return parsed.toInt();
+    } else {
+      return parsed;
+    }
+  }
+
 }
 
 /// ===== Validation helpers =====

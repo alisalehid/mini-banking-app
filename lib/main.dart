@@ -23,15 +23,21 @@ import 'features/local_transactions/presentation/bloc/transfer/local_transaction
 
 import 'features/transactions/data/datasources/transaction_remote_data_source.dart';
 import 'features/transactions/data/repositories/transaction_repository_impl.dart';
+import 'features/transactions/di/transaction_injection.dart' as transaction_injection;
 import 'features/transactions/domain/usecases/get_transactions.dart';
 import 'features/transactions/presentation/bloc/transaction_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize feature injections
-  await auth_di.initAuth();
+  // Local transactions
   await local_tx_di.initLocalTransactionsModule();
+
+  // Remote transactions
+  await transaction_injection.initTransactionModule();
+
+  // Auth
+  await auth_di.initAuth();
 
   runApp(const MyApp());
 }

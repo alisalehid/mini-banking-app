@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/presentation/theme/app_colors.dart';
-import '../../domain/entities/transaction.dart';
+import '../../../local_transactions/domain/entities/dashboard_transaction.dart';
 
 class TransactionCard extends StatelessWidget {
-  final Transaction transaction;
+  final DashboardTransaction transaction;
 
   const TransactionCard({super.key, required this.transaction});
 

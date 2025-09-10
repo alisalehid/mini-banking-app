@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mini_banking_app/core/theme/presentation/theme/app_colors.dart';
+import 'package:mini_banking_app/features/local_transactions/domain/entities/local_transactions_transaction_entity.dart';
+import '../../../local_transactions/domain/entities/dashboard_transaction.dart';
+import '../../data/models/transaction_model.dart';
 import '../bloc/transaction_bloc.dart';
 import '../bloc/transaction_event.dart';
 import '../bloc/transaction_state.dart';
@@ -159,13 +162,26 @@ class _TransactionPageState extends State<TransactionPage> {
                       );
                     }
 
-                    return ListView.builder(
-                      itemCount: filteredTransactions.length,
-                      itemBuilder: (context, index) {
-                        final tx = filteredTransactions[index];
-                        return TransactionCard(transaction: tx);
-                      },
-                    );
+                    else if (state is TransactionLoaded) {
+                      final filteredTransactions = state.transactions.where((tx) {
+                        final matchesSearch = tx.description.toLowerCase().contains(_searchQuery);
+                        final matchesAccount = _selectedAccount == "All" || tx.account == _selectedAccount;
+                        return matchesSearch && matchesAccount;
+                      }).toList();
+
+                      if (filteredTransactions.isEmpty) {
+                        return const Center(child: Text("Nothing found"));
+                      }
+
+                      return ListView.builder(
+                        itemCount: filteredTransactions.length,
+                        itemBuilder: (context, index) {
+                          final dashboardTx = filteredTransactions[index];
+                          return TransactionCard(transaction: dashboardTx);
+                        },
+                      );
+                    }
+
                   } else if (state is TransactionError) {
                     return Center(child: Text("Error: ${state.message}"));
                   }
@@ -178,4 +194,6 @@ class _TransactionPageState extends State<TransactionPage> {
       ),
     );
   }
+
+
 }

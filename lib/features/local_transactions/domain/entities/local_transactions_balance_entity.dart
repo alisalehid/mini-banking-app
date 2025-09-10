@@ -1,4 +1,4 @@
 class LocalTransactionsBalanceEntity {
-  final int amountCents;
-  const LocalTransactionsBalanceEntity(this.amountCents);
+  final String amount;
+  const LocalTransactionsBalanceEntity(this.amount);
 }

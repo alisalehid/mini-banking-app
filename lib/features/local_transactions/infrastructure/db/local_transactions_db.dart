@@ -22,7 +22,7 @@ class LocalTransactionsDb extends _$LocalTransactionsDb {
       // Seed default balance (120000 cents)
       await into(balances).insert(
         BalancesCompanion(
-          amountCents: Value(12000),
+          amount: Value(12000),
         ),
       );
     },

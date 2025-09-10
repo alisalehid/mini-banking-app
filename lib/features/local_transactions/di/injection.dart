@@ -10,8 +10,6 @@ import '../domain/usecases/send_local_transactions_money.dart';
 import '../presentation/bloc/dashboard/local_transactions_dashboard_bloc.dart';
 import '../presentation/bloc/transfer/local_transactions_transfer_bloc.dart';
 
-
-
 final sl = GetIt.instance;
 
 /// Call this once during app startup.
@@ -22,11 +20,13 @@ Future<void> initLocalTransactionsModule() async {
   sl.registerLazySingleton<TransactionDao>(() => TransactionDao(sl()));
 
   // ----- Repository -----
-  sl.registerLazySingleton<LocalTransactionsRepository>(() => LocalTransactionsRepositoryImpl(
-    db: sl(),
-    balanceDao: sl(),
-    transactionDao: sl(),
-  ));
+  sl.registerLazySingleton<LocalTransactionsRepository>(
+    () => LocalTransactionsRepositoryImpl(
+      db: sl(),
+      balanceDao: sl(),
+      transactionDao: sl(),
+    ),
+  );
 
   // ----- Use cases -----
   sl.registerLazySingleton(() => GetLocalTransactionsBalance(sl()));
@@ -34,15 +34,20 @@ Future<void> initLocalTransactionsModule() async {
   sl.registerLazySingleton(() => SendLocalTransactionsMoney(sl()));
 
   // ----- Presentation (BLoCs) -----
-  sl.registerFactory(() => LocalTransactionsDashboardBloc(
-    getBalance: sl(),
-    getRecent: sl(),
-  ));
+  sl.registerFactory(
+    () => LocalTransactionsDashboardBloc(
+      getBalance: sl(),
+      getRecentLocal: sl(),
+      getRemote: sl(),
+    ),
+  );
 
-  sl.registerFactory(() => LocalTransactionsTransferBloc(
-    getBalance: sl(),
-    sendMoney: sl(),
-    onSuccessNavigateBack: null, // router handles navigation in page
-    onSuccessRefreshDashboard: null,
-  ));
+  sl.registerFactory(
+    () => LocalTransactionsTransferBloc(
+      getBalance: sl(),
+      sendMoney: sl(),
+      onSuccessNavigateBack: null, // router handles navigation in page
+      onSuccessRefreshDashboard: null,
+    ),
+  );
 }

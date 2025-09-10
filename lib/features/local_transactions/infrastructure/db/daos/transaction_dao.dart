@@ -11,12 +11,16 @@ class TransactionDao extends DatabaseAccessor<LocalTransactionsDb> with _$Transa
   Future<int> insertTransaction({
     required DateTime date,
     required String description,
-    required int amountCents, // signed
+    required int amount,
+    required String status,
+    required String account
   }) {
     return into(localTxns).insert(LocalTxnsCompanion.insert(
       date: date,
       description: description,
-      amountCents: amountCents,
+      amount: amount,
+      status: status ,
+      account: account
     ));
   }
 

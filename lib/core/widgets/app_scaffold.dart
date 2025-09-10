@@ -9,7 +9,7 @@ class AppScaffold extends StatelessWidget {
    AppScaffold({super.key, required this.child});
 
   static final List<_NavItem> _navItems = [
-    _NavItem('/dashboard', Icons.home, 'Home'),
+    _NavItem('/local/dashboard', Icons.home, 'Home'),
     _NavItem('/transactions', Icons.payment, 'Transactions'),
     _NavItem('/about', Icons.info_outline_rounded, 'About us'),
     _NavItem('/settings', Icons.settings, 'Settings'),
