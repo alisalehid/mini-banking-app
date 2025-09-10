@@ -160,6 +160,7 @@ class _TransferViewState extends State<_TransferView> {
                   CustomLoadingButton(
                     controller: _loadingController,
                     title: "Send",
+                    indicatorColor: AppColors.titleButtonColor(context),
                     titleColor: AppColors.titleButtonColor(context),
                     fillColor: state.isFormValid
                         ? AppColors.buttonColor(context)

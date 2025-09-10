@@ -128,10 +128,11 @@ class _LoginViewState extends State<_LoginView> {
                   CustomLoadingButton(
                     controller: _loadingController,
                     title: "Login",
+                    indicatorColor: AppColors.titleButtonColor(context),
                     titleColor: AppColors.titleButtonColor(context),
                     fillColor: state.isValid
                         ? AppColors.buttonColor(context)
-                        : AppColors.buttonColor(context).withOpacity(0.5),
+                        : AppColors.buttonColor(context),
                     onTap: state.isValid
                         ? () {
                       _loadingController.start();
